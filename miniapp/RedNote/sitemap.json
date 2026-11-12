@@ -1,0 +1,4 @@
+{
+  "desc": "Development publishing assistant; no searchable draft pages.",
+  "rules": [{ "action": "disallow", "page": "*" }]
+}

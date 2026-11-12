@@ -1,0 +1,56 @@
+{
+  "rewrite-models": [
+    {
+      "name": "原文案模型",
+      "base_url": "https://ws-io13u72vcgcp16lh.cn-beijing.maas.aliyuncs.com/compatible-mode/v1",
+      "model": "qwen-plus",
+      "vision": false,
+      "id": "preset-rewrite-1"
+    },
+    {
+      "name": "deepseek",
+      "base_url": "https://api.deepseek.com",
+      "model": "deepseek-flash",
+      "vision": false,
+      "id": "preset-rewrite-2"
+    },
+    {
+      "name": "参考图画面规划",
+      "base_url": "https://ws-io13u72vcgcp16lh.cn-beijing.maas.aliyuncs.com/compatible-mode/v1",
+      "model": "qwen3.8-omni-flash",
+      "vision": true,
+      "id": "preset-rewrite-3"
+    }
+  ],
+  "image-models": [
+    {
+      "name": "Qwen-Image-3.0",
+      "base_url": "https://ws-io13u72vcgcp16lh.cn-beijing.maas.aliyuncs.com/compatible-mode/v1",
+      "model": "Qwen-Image-3.0",
+      "id": "preset-image-1"
+    }
+  ],
+  "video-models": [
+    {
+      "name": "视频生成",
+      "base_url": "https://ws-io13u72vcgcp16lh.cn-beijing.maas.aliyuncs.com/compatible-mode/v1",
+      "model": "Wan3.0-Video-Prime",
+      "vision": false,
+      "id": "preset-video-1"
+    }
+  ],
+  "services": {
+    "text": {
+      "base_url": "https://ws-io13u72vcgcp16lh.cn-beijing.maas.aliyuncs.com/compatible-mode/v1",
+      "model": "qwen-plus"
+    },
+    "ocr": {
+      "base_url": "https://ws-io13u72vcgcp16lh.cn-beijing.maas.aliyuncs.com/compatible-mode/v1",
+      "model": "qwen3.5-ocr"
+    },
+    "asr": {
+      "base_url": "wss://dashscope.aliyuncs.com/api-ws/v1/inference",
+      "model": "paraformer-realtime-v2"
+    }
+  }
+}

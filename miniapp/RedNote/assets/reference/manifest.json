@@ -1,0 +1,20 @@
+{
+  "sichuan-v1.jpg": {
+    "sha256": "1c70b08425b0a09816a5bfd165c3c7223da95cd341a779dcba236db90a4192d0",
+    "size": 320452,
+    "height": 1448,
+    "width": 1086
+  },
+  "cafe-v1.jpg": {
+    "sha256": "18aa5f9a28883cf4b1b7f95a5193abb9da24c01f3760f4431c8ac5729b376680",
+    "size": 240514,
+    "height": 1448,
+    "width": 1086
+  },
+  "bakery-v1.jpg": {
+    "sha256": "0d2b5f7b04e4a5a00440263651e478a5eddb6083cc21928f5207ecd5668ba480",
+    "size": 271069,
+    "height": 1448,
+    "width": 1086
+  }
+}

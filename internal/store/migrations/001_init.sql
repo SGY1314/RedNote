@@ -1,0 +1,15 @@
+CREATE TABLE IF NOT EXISTS schema_migrations (version INTEGER PRIMARY KEY, applied_at TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS notes (id TEXT PRIMARY KEY, data TEXT NOT NULL CHECK(json_valid(data)));
+CREATE UNIQUE INDEX IF NOT EXISTS notes_platform_identity ON notes(json_extract(data, '$.platform'), json_extract(data, '$.note_id'));
+CREATE TABLE IF NOT EXISTS revisions (id TEXT PRIMARY KEY, data TEXT NOT NULL CHECK(json_valid(data)));
+CREATE INDEX IF NOT EXISTS revisions_note ON revisions(json_extract(data, '$.note_id'));
+CREATE TABLE IF NOT EXISTS assets (id TEXT PRIMARY KEY, data TEXT NOT NULL CHECK(json_valid(data)));
+CREATE TABLE IF NOT EXISTS extractions (id TEXT PRIMARY KEY, data TEXT NOT NULL CHECK(json_valid(data)));
+CREATE TABLE IF NOT EXISTS projects (id TEXT PRIMARY KEY, data TEXT NOT NULL CHECK(json_valid(data)));
+CREATE TABLE IF NOT EXISTS versions (id TEXT PRIMARY KEY, data TEXT NOT NULL CHECK(json_valid(data)));
+CREATE INDEX IF NOT EXISTS versions_project ON versions(json_extract(data, '$.project_id'));
+CREATE TABLE IF NOT EXISTS publications (id TEXT PRIMARY KEY, data TEXT NOT NULL CHECK(json_valid(data)));
+CREATE TABLE IF NOT EXISTS jobs (id TEXT PRIMARY KEY, data TEXT NOT NULL CHECK(json_valid(data)));
+CREATE INDEX IF NOT EXISTS jobs_queue ON jobs(json_extract(data, '$.kind'),json_extract(data, '$.state'));
+CREATE TABLE IF NOT EXISTS settings (id TEXT PRIMARY KEY, data TEXT NOT NULL CHECK(json_valid(data)));
+INSERT OR IGNORE INTO schema_migrations VALUES (1, datetime('now'));

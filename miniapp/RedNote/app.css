@@ -1,0 +1,13 @@
+page { background: #f5f6f8; color: #282a30; font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif; font-size: 28rpx; }
+view, button, input, textarea, scroll-view { box-sizing: border-box; }
+button { margin: 0; min-height: 44px; border: 0; font-size: 28rpx; font-weight: 500; line-height: 1.5; border-radius: 18rpx; padding: 24rpx 28rpx; }
+button::after { border: 0; }
+button[disabled] { background: #ebecef; color: #a8abb2; }
+.page { max-width: 960rpx; margin: 0 auto; padding: 28rpx 26rpx 48rpx; }
+.surface { background: #fff; border: 1rpx solid #f0f1f3; border-radius: 24rpx; box-shadow: 0 7rpx 24rpx rgba(33,38,48,.025); }
+.muted { color: #969aa3; font-size: 24rpx; line-height: 1.65; }
+.primary { background: #ff2442; color: #fff; }
+.secondary { background: #fff; color: #dd3654; border: 1rpx solid #e96a80; }
+.link { min-height: 44px; color: #8e929b; background: transparent; padding: 18rpx 12rpx; font-size: 24rpx; font-weight: 400; }
+.error { color: #bf4554; line-height: 1.6; font-size: 24rpx; overflow-wrap: anywhere; }
+.primary:active, .secondary:active { opacity: .86; }

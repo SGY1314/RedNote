@@ -1,0 +1,8 @@
+{
+  "server_url": "https://YOUR-SERVICE.service.douyincloud.run",
+  "control_key_file": "C:/PrivateWorkbench/douyin-control.key",
+  "app_id": "YOUR_MINIAPP_APPID",
+  "app_secret_file": "C:/PrivateWorkbench/douyin-app-secret.key",
+  "storage_host": "YOUR-BUCKET.tos-cn-beijing.volces.com",
+  "launch_environment": "development"
+}

@@ -1,0 +1,72 @@
+.mobile-publish-dialog {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+}
+.mobile-publish-dialog h3,
+.mobile-publish-dialog p {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.mobile-publish-dialog > .ant-alert {
+  width: 100%;
+}
+.mobile-publish-qr {
+  align-self: center;
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  max-width: 100%;
+}
+.mobile-publish-qr > .ant-qrcode {
+  background: #fff;
+}
+.mobile-publish-help {
+  font-size: 12px;
+  line-height: 1.7;
+  color: #686664;
+}
+@media (max-width: 400px) {
+  .mobile-publish-dialog {
+    gap: 12px;
+  }
+  .mobile-publish-dialog h3 {
+    font-size: 16px;
+  }
+}
+
+.mobile-handoff-steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin: 20px 0;
+}
+.mobile-handoff-steps > div {
+  background: #f1f5f2;
+  border-radius: 8px;
+  padding: 12px 6px;
+  text-align: center;
+  color: #7f8d83;
+  font-size: 12px;
+}
+.mobile-handoff-steps > .current {
+  background: #dfeae2;
+  color: #3f6751;
+  font-weight: 600;
+}
+.mobile-handoff-steps b {
+  display: block;
+  margin-bottom: 6px;
+}
+
+.mobile-handoff-steps {
+  width: 100%;
+  margin: 0;
+}
+
+.mobile-publish-actions.ant-space {
+  align-self: stretch;
+  justify-content: flex-end;
+}

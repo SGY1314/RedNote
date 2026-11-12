@@ -1,0 +1,57 @@
+.workflow-account-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.workflow-account-heading h3 {
+  margin: 0;
+}
+.workflow-account-heading .ant-tag {
+  margin: 0;
+  color: var(--forest-accent);
+  background: var(--forest-sage);
+  border-color: var(--forest-line);
+}
+.workflow-account-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+.workflow-account-wide {
+  grid-column: 1 / -1;
+}
+.workflow-account-fields .workflow-field {
+  margin: 0;
+  min-width: 0;
+}
+.workflow-account-fields .ant-input {
+  line-height: 1.8;
+}
+.workflow-account-actions {
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 26px;
+}
+.workflow-account-actions .ant-btn {
+  min-width: 140px;
+  height: 40px;
+}
+@media (max-width: 600px) {
+  .workflow-account-fields {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 18px;
+  }
+  .workflow-account-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+  .workflow-account-actions .ant-btn {
+    min-width: 0;
+    padding-inline: 8px;
+    font-size: 12px;
+  }
+}

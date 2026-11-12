@@ -1,0 +1,205 @@
+.media-source-carousel.title-original-media {
+  display: block;
+  background: #fff;
+  outline: none;
+  isolation: isolate;
+}
+.media-source-carousel:focus-visible {
+  outline: 2px solid var(--forest-accent);
+  outline-offset: 3px;
+}
+.media-source-stage {
+  position: absolute;
+  inset: 0;
+  height: 100%;
+  width: 100%;
+  perspective: 1100px;
+  overflow: hidden;
+  border-radius: inherit;
+  touch-action: pan-y pinch-zoom;
+}
+.media-source-stage .ant-image,
+.media-source-stage .ant-image-img,
+.media-source-stage video,
+.source-book-front img {
+  width: 100%;
+  height: 100%;
+}
+.media-source-stage .ant-image-img,
+.source-book-front img {
+  object-fit: cover;
+  object-position: top center;
+  user-select: none;
+}
+.media-source-stage .ant-image {
+  cursor: grab;
+}
+.media-source-stage .ant-image:active {
+  cursor: grabbing;
+}
+.media-source-stage video {
+  object-fit: contain;
+  background: #fff;
+}
+.source-media-empty {
+  display: grid;
+  place-items: center;
+  height: 100%;
+  color: var(--forest-muted);
+  opacity: 0.45;
+  font-size: 32px;
+}
+.media-source-carousel .source-page-button.ant-btn {
+  position: absolute;
+  z-index: 4;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 28px;
+  min-width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  background: #fff;
+  color: var(--forest-ink);
+  box-shadow: 0 1px 7px #2031281a;
+}
+.source-page-previous {
+  left: 7px;
+}
+.source-page-next {
+  right: 7px;
+}
+.media-source-carousel .source-page-button.ant-btn:disabled {
+  color: #aeb9ab;
+  background: #fff;
+  box-shadow: none;
+}
+.source-media-index {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 3px 8px;
+  border-radius: 20px;
+  color: var(--forest-muted);
+  background: #fffffff0;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 4;
+}
+.source-media-choice {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 5;
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  background: #fff;
+}
+.source-media-choice .ant-checkbox-wrapper {
+  margin: 0;
+  line-height: 1;
+}
+.source-book-page {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  pointer-events: none;
+  will-change: transform;
+  z-index: 2;
+  animation-duration: 640ms;
+  animation-timing-function: cubic-bezier(0.45, 0.05, 0.55, 0.95);
+  animation-fill-mode: both;
+}
+.source-book-page.turn-next {
+  transform-origin: left center;
+  animation-name: source-book-next;
+}
+.source-book-page.turn-previous {
+  transform-origin: right center;
+  animation-name: source-book-previous;
+}
+.source-book-front,
+.source-book-back {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  backface-visibility: hidden;
+  background: #fff;
+  box-shadow: 7px 0 18px #20312826;
+}
+.source-book-front {
+  overflow: hidden;
+}
+.source-book-front::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    #263c3126,
+    transparent 35%,
+    #fff3 85%,
+    #263c3126
+  );
+}
+.source-book-back {
+  transform: rotateY(180deg);
+  background: linear-gradient(90deg, #e9e9df, #fff 28%, #f8f8f2);
+}
+@keyframes source-book-next {
+  from {
+    transform: rotateY(0deg);
+    opacity: 1;
+  }
+  85% {
+    opacity: 1;
+  }
+  to {
+    transform: rotateY(-135deg);
+    opacity: 0;
+  }
+}
+@keyframes source-book-previous {
+  from {
+    transform: rotateY(0deg);
+    opacity: 1;
+  }
+  85% {
+    opacity: 1;
+  }
+  to {
+    transform: rotateY(135deg);
+    opacity: 0;
+  }
+}
+@media (max-width: 600px) {
+  .media-source-carousel .source-page-button.ant-btn {
+    width: 24px;
+    min-width: 24px;
+    height: 28px;
+  }
+  .source-page-previous {
+    left: 3px;
+  }
+  .source-page-next {
+    right: 3px;
+  }
+  .source-media-choice {
+    width: 26px;
+    height: 26px;
+    top: 5px;
+    right: 5px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .source-book-page {
+    animation: none;
+    display: none;
+  }
+}

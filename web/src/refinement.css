@@ -1,0 +1,1938 @@
+/* RedNote UI refinement — shared surfaces, navigation and responsive layout. */
+.standalone-media-page[hidden] {
+  display: none;
+}
+.media-page-intro {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 26px;
+}
+.media-page-intro h1 {
+  margin: 9px 0;
+  font-size: 32px;
+  font-weight: 600;
+  color: #2d4030;
+}
+.media-page-intro p {
+  color: #78856e;
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.8;
+}
+.page-media .embedded-workspace {
+  padding: 24px;
+  background: #fbfcf6;
+  border: 1px solid #dce2ce;
+  border-radius: 16px;
+}
+@media (max-width: 560px) {
+  .rednote-shell .sidebar nav[aria-label="主导航"] {
+    flex: 4;
+  }
+  .media-page-intro {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .media-page-intro h1 {
+    font-size: 28px;
+  }
+  .page-media .embedded-workspace {
+    padding: 16px;
+  }
+}
+:root {
+  --rednote-bg: #f1f1e7;
+  --rednote-surface: #fff;
+  --rednote-ink: #2d4030;
+  --rednote-muted: #6d7c63;
+  --rednote-line: #dce2ce;
+  --rednote-accent: #476a4d;
+  --rednote-accent-soft: #e8ecdd;
+}
+body {
+  -webkit-font-smoothing: antialiased;
+}
+button,
+a,
+input,
+textarea {
+  -webkit-tap-highlight-color: transparent;
+}
+button:focus-visible,
+a:focus-visible,
+[role="button"]:focus-visible,
+summary:focus-visible {
+  outline: 3px solid #567958;
+  outline-offset: 4px;
+}
+.brand-period {
+  color: #d0c36a;
+}
+.reference-design {
+  --workspace-bg: #f1f1e7;
+  --workspace-muted: #6d7c63;
+  --workspace-line: #dce2ce;
+  --workspace-ink: #2d4030;
+  --workspace-blue: #476a4d;
+}
+.rednote-shell .sidebar,
+.admin-sidebar {
+  background: #2c4c37;
+  border-color: #2c4c37;
+  padding: 30px 16px 20px;
+}
+.rednote-shell .brand strong,
+.admin-brand strong {
+  color: #fff7eb;
+  font-family: Georgia, "Microsoft YaHei", serif;
+  font-size: 23px;
+  letter-spacing: -0.7px;
+}
+.rednote-shell .brand small,
+.admin-brand small {
+  color: #bac8b0;
+  font-size: 10px;
+  letter-spacing: 1px;
+}
+.rednote-shell .brand-mark,
+.admin-brand-mark {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: #f3f1df;
+  box-shadow: none;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.admin-brand-mark img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.rednote-shell .sidebar nav,
+.admin-nav {
+  margin-top: 40px;
+  gap: 8px;
+}
+.rednote-shell .nav-item,
+.admin-nav-item {
+  position: relative;
+  min-height: 46px;
+  border-radius: 10px;
+  padding: 12px 15px;
+  color: #d4dfc9;
+  font-size: 13px;
+  transition:
+    background 0.16s,
+    color 0.16s;
+}
+.rednote-shell .nav-item:hover,
+.admin-nav-item:hover {
+  background: #3b5b44;
+  color: #fff7eb;
+}
+.rednote-shell .nav-item.selected,
+.admin-nav-item.selected {
+  background: #e8ecdd;
+  color: #2c4c37;
+  font-weight: 600;
+}
+.rednote-shell .nav-item.selected::after,
+.admin-nav-item.selected::after {
+  content: "";
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #476a4d;
+  margin-left: auto;
+}
+.rednote-shell .workspace-status {
+  color: #c3d0b9;
+  font-size: 10px;
+  margin: 0 10px 18px;
+  line-height: 1.8;
+}
+.rednote-shell .workspace-status span {
+  overflow-wrap: anywhere;
+}
+.rednote-shell .sidebar-version {
+  color: #adbea3;
+  font-size: 8px;
+  letter-spacing: 0.8px;
+  padding: 22px 10px 0;
+}
+.admin-sidebar-foot {
+  border-color: #4b6850;
+}
+.admin-sidebar-foot small {
+  color: #bac8b0;
+}
+.rednote-shell .topbar {
+  background: #ffffffed;
+  min-height: 72px;
+  padding: 12px 32px;
+  border-bottom: 1px solid #dce2ce;
+}
+.rednote-shell .topbar-wordmark {
+  font-size: 27px;
+  color: #514838;
+  letter-spacing: -1px;
+}
+.rednote-shell .workspace-crumb {
+  font-size: 12px;
+  color: #6d7c63;
+}
+.rednote-shell .topbar .ant-btn {
+  border-color: #dce2ce;
+  background: #fbfcf6;
+  height: 36px;
+  font-size: 12px;
+}
+.rednote-shell .main-shell {
+  min-width: 0;
+  background: #f1f1e7;
+}
+.rednote-shell .page-content {
+  padding: 30px 32px 40px;
+}
+.workspace-intro {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding-bottom: 26px;
+}
+.section-eyebrow {
+  font-size: 9px;
+  color: #8d735e;
+  letter-spacing: 2.2px;
+}
+.workspace-intro h1 {
+  margin: 9px 0 7px;
+  font-size: 29px;
+  line-height: 1.35;
+  font-weight: 650;
+  letter-spacing: -0.8px;
+}
+.workspace-intro h1 > span {
+  display: inline-block;
+  font-weight: 400;
+  font-size: 13px;
+  color: #82776b;
+  letter-spacing: 0.3px;
+  margin-left: 16px;
+}
+.workspace-intro p {
+  font-size: 12px;
+  color: #6d7c63;
+  margin: 0;
+}
+.workflow-shortcuts {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.workflow-shortcuts button {
+  display: flex;
+  gap: 7px;
+  align-items: center;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  padding: 9px 11px;
+  background: none;
+  color: #6d7c63;
+  font-size: 12px;
+}
+.workflow-shortcuts button small {
+  font-size: 10px;
+  color: #938578;
+}
+.workflow-shortcuts button[aria-current],
+.workflow-shortcuts button:hover {
+  background: #f1e8dc;
+  color: #8e432c;
+}
+.rednote-shell .capture-card {
+  background: #fbfcf6;
+  border: 1px solid #dce2ce;
+  border-radius: 16px;
+  padding: 22px 24px 18px;
+  margin-bottom: 28px;
+  box-shadow: 0 3px 16px #2d403003;
+}
+.rednote-shell .capture-title {
+  gap: 12px;
+  margin-bottom: 15px;
+}
+.rednote-shell .capture-title > .anticon {
+  width: 39px;
+  height: 39px;
+  display: grid;
+  place-items: center;
+  background: #e8ecdd;
+  border-radius: 11px;
+  font-size: 20px;
+  color: #476a4d;
+}
+.rednote-shell .capture-title strong {
+  font-size: 14px;
+  color: #2d4030;
+}
+.capture-description {
+  display: block;
+  margin-top: 4px;
+  font-size: 11px;
+  font-weight: 400;
+  color: #6d7c63;
+}
+.rednote-shell .capture-card textarea {
+  background: #faf9f6;
+  border: 1px solid #ebe5dc;
+  border-radius: 10px;
+  padding: 13px 15px;
+  font-size: 13px;
+  line-height: 1.8;
+}
+.rednote-shell .capture-foot {
+  margin-top: 12px;
+  padding-top: 0;
+  border: 0;
+}
+.rednote-shell .ant-btn-primary,
+.admin-shell .ant-btn-primary,
+.rednote-login .ant-btn-primary,
+.rednote-shell .capture-foot .ant-btn-primary {
+  background: #476a4d;
+  border-color: #476a4d;
+  color: #fff;
+  box-shadow: 0 3px 6px #476a4d10;
+}
+.rednote-shell .ant-btn-primary:not(:disabled):hover,
+.admin-shell .ant-btn-primary:not(:disabled):hover,
+.rednote-login .ant-btn-primary:not(:disabled):hover {
+  background: var(--forest-gold-hover) !important;
+  border-color: var(--forest-gold-hover) !important;
+}
+.rednote-shell .ant-btn-primary:disabled,
+.admin-shell .ant-btn-primary:disabled {
+  background: #f0eeea;
+  border-color: #dce2ce;
+  color: #a59e95;
+  box-shadow: none;
+}
+.rednote-shell .table-panel {
+  border: 0;
+  background: transparent;
+  border-radius: 0;
+}
+.rednote-shell .panel-toolbar {
+  padding: 0 0 18px;
+  gap: 16px;
+  border: 0;
+  background: transparent;
+  align-items: flex-start;
+}
+.rednote-shell .panel-tabs {
+  padding-top: 7px;
+  flex-shrink: 0;
+}
+.rednote-shell .panel-tabs strong {
+  font-size: 18px;
+  color: #2d4030;
+}
+.rednote-shell .panel-tabs strong > span {
+  color: #476a4d;
+  background: #e8ecdd;
+}
+.rednote-shell .panel-toolbar > .ant-space {
+  justify-content: flex-end;
+}
+.rednote-shell .filter-line {
+  padding: 12px 0 18px;
+  border-top: 1px solid #dce2ce;
+  background: transparent;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.rednote-shell .collection-card {
+  border-color: #dce2ce;
+  background: #fbfcf6;
+  border-radius: 14px;
+  box-shadow: 0 2px 6px #2d403004;
+}
+.rednote-shell .collection-card:hover {
+  border-color: #c9ab98;
+  box-shadow: 0 8px 24px #2d403010;
+  transform: translateY(-3px);
+}
+.rednote-shell .collection-card-preview {
+  min-height: 140px;
+}
+.rednote-shell .collection-card-body strong {
+  color: #2d4030;
+  font-size: 14px;
+  line-height: 1.65;
+}
+.rednote-shell .collection-card-stats {
+  color: #718169;
+}
+.rednote-shell .collection-card-footer {
+  border-color: #e9eddf;
+}
+.rednote-shell .collection-grid-empty {
+  border: 1px dashed #d8cbbd;
+  border-radius: 14px;
+  background: #fbfcf6;
+  padding: 36px 16px;
+}
+.rednote-shell .ant-table,
+.admin-shell .ant-table {
+  background: #fbfcf6;
+}
+.rednote-shell .ant-table-thead > tr > th,
+.admin-shell .ant-table-thead > tr > th {
+  background: #edf0e3;
+  color: #6d7c63;
+  font-size: 12px;
+  font-weight: 500;
+}
+.rednote-shell .ant-table-tbody > tr:nth-child(even) > td {
+  background: #fbfcf6;
+}
+.connection-warning {
+  border: 1px solid #e8caa2;
+  background: #fff7e9;
+  border-radius: 10px;
+  padding: 12px 16px;
+  margin-bottom: 20px;
+  font-size: 12px;
+  color: #885625;
+}
+
+/* Login: a complete brand canvas with a quiet, focused form. */
+.rednote-login {
+  grid-template-columns: 1.13fr 1fr;
+  min-height: 100dvh;
+  background: #fbfcf6;
+}
+.rednote-login .login-story {
+  position: relative;
+  min-height: 100dvh;
+  padding: 44px clamp(32px, 4.5vw, 76px) 30px;
+  background: #f1ede4;
+  overflow: hidden;
+}
+.rednote-login .login-story::before {
+  content: "";
+  position: absolute;
+  width: 520px;
+  height: 520px;
+  top: -350px;
+  right: -180px;
+  border: 1px solid #dcd1c2;
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 36px #eae3d780,
+    0 0 0 72px #eee8de80;
+  pointer-events: none;
+}
+.rednote-login .login-brand {
+  position: relative;
+  gap: 12px;
+}
+.rednote-login .login-mark {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+}
+.rednote-login .login-brand strong {
+  font-size: 29px;
+  font-family: Georgia, serif;
+  letter-spacing: -1px;
+}
+.rednote-login .login-brand small {
+  color: #766c60;
+  font-size: 10px;
+  letter-spacing: 1px;
+}
+.rednote-login .login-story-copy {
+  position: relative;
+  margin: auto 0;
+  padding: 48px 0 40px;
+}
+.rednote-login .login-kicker {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 9px;
+  color: #8c715a;
+  letter-spacing: 2.2px;
+}
+.login-kicker i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #476a4d;
+}
+.rednote-login .login-story-copy h1 {
+  font-family: "STSong", "SimSun", Georgia, serif;
+  font-weight: 500;
+  font-size: clamp(38px, 3.8vw, 60px);
+  line-height: 1.42;
+  letter-spacing: 1px;
+  margin: 24px 0 18px;
+  color: #34362e;
+}
+.login-story-copy h1 em {
+  font-style: normal;
+  color: #476a4d;
+}
+.rednote-login .login-story-copy > p {
+  font-size: 13px;
+  color: #756c60;
+  white-space: pre-line;
+  line-height: 1.95;
+}
+.story-workflow {
+  margin-top: 34px;
+  border: 1px solid #e1d8ca;
+  border-radius: 14px;
+  background: #fffcf5a8;
+  padding: 18px;
+  box-shadow: 0 12px 28px #59433105;
+}
+.story-workflow-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 22px;
+  color: #63594c;
+  font-size: 11px;
+}
+.story-workflow-head > span:last-child {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 7px;
+  letter-spacing: 1.1px;
+  color: #8d8172;
+}
+.story-step-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.story-step {
+  min-width: 0;
+  position: relative;
+  padding: 0 14px;
+  border-left: 1px solid #e8e0d4;
+}
+.story-step:first-child {
+  border: 0;
+  padding-left: 0;
+}
+.story-step:last-child {
+  padding-right: 0;
+}
+.story-step-icon {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  background: #ebe2d4;
+  color: #8c6042;
+  border-radius: 10px;
+  font-size: 16px;
+  margin-bottom: 14px;
+}
+.story-step:nth-child(2) .story-step-icon {
+  background: #f3e1d7;
+  color: #476a4d;
+}
+.story-step:nth-child(3) .story-step-icon {
+  background: #e5e8dc;
+  color: #667552;
+}
+.story-step > small {
+  position: absolute;
+  top: 9px;
+  right: 15px;
+  color: #b0a18e;
+  font:
+    11px Georgia,
+    serif;
+}
+.story-step strong {
+  display: block;
+  font-size: 12px;
+  color: #554d40;
+  font-weight: 600;
+}
+.rednote-login .story-step p {
+  font-size: 9px;
+  line-height: 1.6;
+  color: #7d7162;
+  margin: 5px 0 0;
+}
+.rednote-login .login-story-foot {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 10px;
+  color: #807567;
+}
+.login-story-foot > span:first-child {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.login-story-foot > span:last-child {
+  font-size: 8px;
+  letter-spacing: 1.3px;
+}
+.rednote-login .login-panel {
+  min-height: 100dvh;
+  background: #fbfcf6;
+  padding: 48px clamp(30px, 5vw, 84px) 70px;
+}
+.rednote-login .login-form-card {
+  max-width: 368px;
+}
+.rednote-login .admin-pill {
+  border-radius: 20px;
+  padding: 6px 11px;
+  font-size: 11px;
+  background: #e8ecdd;
+  color: #9f452f;
+}
+.rednote-login .user-pill {
+  background: #edf0e7;
+  color: #5c6c49;
+}
+.rednote-login .login-form-card h2 {
+  font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+  font-size: 26px;
+  font-weight: 600;
+  margin: 22px 0 10px;
+  letter-spacing: -0.6px;
+}
+.rednote-login .login-form-lead {
+  font-size: 12px;
+  color: #6d7c63;
+  margin-bottom: 32px;
+}
+.rednote-login .login-field {
+  margin-bottom: 21px;
+}
+.rednote-login .login-field > label {
+  display: block;
+  margin-bottom: 8px;
+  color: #5c5349;
+  font-size: 12px;
+  font-weight: 500;
+}
+.rednote-login .login-field > .ant-input-affix-wrapper {
+  display: inline-flex;
+  margin-bottom: 0;
+  font-weight: 400;
+}
+.rednote-login .login-field .ant-input-affix-wrapper {
+  min-height: 48px;
+  background: #faf9f6;
+  border-color: #dce2ce;
+  border-radius: 10px;
+  padding: 10px 14px;
+}
+.rednote-login .login-field .ant-input-prefix {
+  color: #9d8c79;
+  margin-right: 10px;
+}
+.rednote-login .login-field .ant-input {
+  background: transparent;
+  font-size: 13px;
+}
+.rednote-login .login-field .ant-input-affix-wrapper-focused {
+  background: #fbfcf6;
+  border-color: #476a4d;
+  box-shadow: 0 0 0 3px #476a4d10;
+}
+.rednote-login .login-field .ant-input::placeholder {
+  color: #a79c8e;
+}
+.rednote-login .login-form-card > .ant-btn-primary {
+  height: 48px;
+  border-radius: 10px;
+  margin-top: 7px;
+  font-size: 13px;
+  display: flex;
+  justify-content: center;
+  gap: 18px;
+  box-shadow: 0 6px 14px #476a4d1a;
+}
+.rednote-login .login-user-link {
+  border-top: 1px solid #f0ece5;
+  width: 100%;
+  padding: 23px 0 0;
+  margin-top: 28px;
+  font-size: 12px;
+  color: #80634d;
+}
+.rednote-login .login-hint {
+  color: #817669;
+  font-size: 10px;
+  line-height: 1.8;
+}
+.rednote-login .login-copyright {
+  color: #8f8476;
+  font-size: 10px;
+  bottom: 28px;
+  letter-spacing: 0.4px;
+}
+
+/* Admin surfaces retain their existing data and controls. */
+.admin-shell {
+  background: #f1f1e7;
+}
+.admin-main {
+  padding: 36px 36px 44px;
+}
+.admin-header {
+  margin-bottom: 28px;
+  align-items: center;
+}
+.admin-eyebrow {
+  font-size: 9px;
+  color: #8d735e;
+  letter-spacing: 2px;
+}
+.admin-heading h1 {
+  font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+  font-size: 28px;
+  font-weight: 600;
+  margin: 9px 0 7px;
+  letter-spacing: -0.7px;
+}
+.admin-heading p {
+  color: #6d7c63;
+  font-size: 12px;
+}
+.admin-content {
+  max-width: 1600px;
+  margin: 0 auto;
+}
+.admin-nav-item > .anticon {
+  display: inline-flex;
+}
+.admin-overview-filter {
+  font-size: 11px;
+  color: #6d7c63;
+  gap: 10px;
+}
+.admin-metric {
+  min-height: 152px;
+  padding: 20px;
+  background: #fbfcf6;
+  border-color: #dce2ce;
+  box-shadow: 0 3px 10px #2d403003;
+}
+.admin-metric.primary {
+  background: #eaece1;
+  border-color: #e0e3d5;
+}
+.admin-metric-label {
+  color: #6e655b;
+}
+.admin-metric-label > .anticon {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: #f1f3e8;
+  color: #987557;
+}
+.admin-metric.primary .admin-metric-label > .anticon {
+  background: #dde1cf;
+  color: #667552;
+}
+.admin-metric > strong {
+  font-size: 32px;
+  letter-spacing: -0.8px;
+  font-weight: 600;
+}
+.admin-metric small {
+  color: #6d7c63;
+  font-size: 11px;
+  padding-top: 12px;
+}
+.admin-panel,
+.admin-page-card,
+.usage-panel,
+.usage-metric,
+.admin-model-card {
+  background: #fbfcf6;
+  border-color: #dce2ce;
+  box-shadow: 0 3px 10px #2d403003;
+  border-radius: 14px;
+}
+.admin-panel-head > strong {
+  font-size: 15px;
+}
+.admin-panel-note {
+  color: #786d60;
+  line-height: 1.8;
+}
+.admin-user-chip {
+  border-color: #dce2ce;
+  background: #fbfcf6;
+}
+.admin-user-chip .admin-user-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.admin-page-card .ant-table-wrapper {
+  overflow-x: auto;
+}
+.admin-page-card .ant-table {
+  min-width: 680px;
+}
+.admin-shell .ant-table-cell {
+  font-size: 12px;
+}
+.admin-connection {
+  color: #6d7c63;
+}
+.admin-user-usage .admin-usage-track {
+  background: #f1eee7;
+}
+.admin-user-usage .admin-usage-track > i {
+  background: #93a077;
+}
+@media (min-width: 1500px) {
+  .rednote-shell .page-collections {
+    max-width: 1760px;
+    width: 100%;
+    margin: 0 auto;
+  }
+}
+@media (max-width: 1200px) {
+  .workspace-intro {
+    align-items: flex-start;
+  }
+  .workflow-shortcuts {
+    gap: 0;
+  }
+  .workflow-shortcuts button {
+    font-size: 11px;
+    padding: 8px;
+  }
+  .workspace-intro h1 > span {
+    display: block;
+    margin: 7px 0 0;
+    font-size: 12px;
+  }
+}
+@media (max-width: 960px) {
+  .rednote-login {
+    grid-template-columns: 1fr 1fr;
+  }
+  .rednote-login .login-story {
+    padding: 32px 26px 28px;
+  }
+  .rednote-login .login-panel {
+    padding: 40px 28px 65px;
+  }
+  .rednote-login .login-story-copy h1 {
+    font-size: 36px;
+  }
+  .story-workflow {
+    padding: 16px 12px;
+  }
+  .story-step {
+    padding: 0 8px;
+  }
+  .story-workflow-head > span:last-child {
+    display: none;
+  }
+  .login-story-foot > span:last-child {
+    display: none;
+  }
+  .rednote-login .story-step p {
+    font-size: 9px;
+  }
+  .admin-sidebar {
+    padding: 24px 10px;
+  }
+  .admin-nav-item {
+    padding: 13px 0;
+  }
+  .admin-nav-item.selected::after {
+    display: none;
+  }
+  .admin-main {
+    padding: 28px 22px;
+  }
+  .admin-header {
+    align-items: flex-start;
+  }
+  .admin-metrics {
+    gap: 12px;
+  }
+}
+@media (max-width: 760px) {
+  .rednote-login {
+    grid-template-columns: 1fr;
+  }
+  .rednote-login .login-story {
+    min-height: auto;
+    padding: 24px 28px 27px;
+  }
+  .rednote-login .login-story-copy {
+    padding: 26px 0 0;
+    margin: 0;
+  }
+  .rednote-login .login-story-copy h1 {
+    font-size: 33px;
+    line-height: 1.45;
+    margin: 15px 0 12px;
+  }
+  .rednote-login .login-story-copy > p {
+    font-size: 12px;
+  }
+  .rednote-login .login-brand strong {
+    font-size: 26px;
+  }
+  .rednote-login .login-brand small {
+    font-size: 9px;
+  }
+  .rednote-login .login-mark {
+    width: 38px;
+    height: 38px;
+  }
+  .rednote-login .login-kicker {
+    font-size: 8px;
+    letter-spacing: 1.6px;
+  }
+  .rednote-login .story-workflow,
+  .rednote-login .login-story-foot {
+    display: none;
+  }
+  .rednote-login .login-panel {
+    min-height: auto;
+    padding: 32px 28px 35px;
+  }
+  .rednote-login .login-form-card {
+    max-width: 440px;
+  }
+  .rednote-login .login-form-card h2 {
+    font-size: 23px;
+    margin-top: 16px;
+  }
+  .rednote-login .login-form-lead {
+    margin-bottom: 24px;
+  }
+  .rednote-login .login-copyright {
+    position: static;
+    margin-top: 28px;
+  }
+  .rednote-shell .sidebar,
+  .rednote-shell.sidebar-collapsed .sidebar {
+    width: 64px;
+    padding: 18px 10px;
+  }
+  .rednote-shell .sidebar .brand {
+    justify-content: center;
+  }
+  .rednote-shell .nav-item {
+    padding: 12px 0;
+    justify-content: center;
+  }
+  .rednote-shell .nav-item.selected::after {
+    display: none;
+  }
+  .rednote-shell .main-shell,
+  .rednote-shell.sidebar-collapsed .main-shell {
+    margin-left: 64px;
+    width: calc(100% - 64px);
+  }
+  .rednote-shell .page-content {
+    padding: 22px 18px 32px;
+  }
+  .rednote-shell .topbar {
+    padding: 12px 18px;
+    gap: 10px;
+  }
+  .rednote-shell .workspace-crumb strong,
+  .rednote-shell .crumb-divider {
+    display: none;
+  }
+  .workspace-intro {
+    flex-direction: column;
+    gap: 15px;
+    padding-bottom: 22px;
+  }
+  .workspace-intro h1 {
+    font-size: 26px;
+  }
+  .workspace-intro h1 > span {
+    display: inline-block;
+    margin-left: 12px;
+  }
+  .workflow-shortcuts {
+    width: 100%;
+    gap: 6px;
+  }
+  .workflow-shortcuts button {
+    flex: 1;
+    justify-content: center;
+    background: #f1eee7;
+  }
+  .rednote-shell .capture-card {
+    padding: 18px;
+  }
+  .rednote-shell .panel-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .rednote-shell .panel-toolbar > .ant-space {
+    justify-content: flex-start;
+  }
+  .rednote-shell .filter-line > .ant-space {
+    flex-wrap: wrap;
+  }
+  .admin-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .admin-metric {
+    min-height: 143px;
+    padding: 16px;
+  }
+  .admin-metric > strong {
+    font-size: 27px;
+  }
+  .admin-metric-label {
+    gap: 7px;
+    font-size: 11px;
+  }
+  .admin-overview-filter {
+    flex-wrap: wrap;
+  }
+  .admin-page-card {
+    min-width: 0;
+  }
+}
+@media (max-width: 560px) {
+  .rednote-shell .sidebar,
+  .rednote-shell.sidebar-collapsed .sidebar,
+  .admin-sidebar {
+    inset: auto 0 0;
+    height: auto;
+    min-height: 68px;
+    width: 100%;
+    padding: 7px 8px calc(7px + env(safe-area-inset-bottom));
+    background: #2c4c37;
+    flex-direction: row;
+    border-right: 0;
+    border-top: 1px solid #43463b;
+    overflow: visible;
+    z-index: 100;
+  }
+  .rednote-shell .sidebar .brand,
+  .rednote-shell .sidebar .workspace-status,
+  .rednote-shell .sidebar-version,
+  .rednote-shell .sidebar-toggle,
+  .admin-brand,
+  .admin-sidebar-foot {
+    display: none;
+  }
+  .rednote-shell .sidebar nav {
+    display: flex;
+    flex: 3;
+    margin: 0;
+    gap: 3px;
+  }
+  .rednote-shell .sidebar-bottom {
+    display: flex;
+    flex: 2;
+    margin: 0;
+    padding: 0;
+    gap: 3px;
+  }
+  .rednote-shell .sidebar .nav-item {
+    min-width: 0;
+    min-height: 52px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 6px 2px;
+    gap: 5px;
+    font-size: 10px;
+    border-radius: 9px;
+  }
+  .rednote-shell .sidebar .nav-label {
+    display: block;
+    white-space: nowrap;
+  }
+  .rednote-shell .sidebar .nav-item > .nav-label {
+    display: block;
+  }
+  .rednote-shell .sidebar .nav-item.sidebar-toggle {
+    display: none;
+  }
+  .rednote-shell .sidebar .nav-item > .anticon {
+    font-size: 18px;
+  }
+  .rednote-shell .main-shell,
+  .rednote-shell.sidebar-collapsed .main-shell {
+    margin-left: 0;
+    width: 100%;
+    padding-bottom: calc(84px + env(safe-area-inset-bottom));
+  }
+  .rednote-shell .topbar {
+    min-height: 64px;
+    padding: 12px 16px;
+  }
+  .rednote-shell .workspace-heading {
+    display: block;
+  }
+  .rednote-shell .topbar-actions .ant-btn > span {
+    display: inline-flex;
+  }
+  .rednote-shell .workspace-crumb {
+    gap: 7px;
+    font-size: 12px;
+  }
+  .rednote-shell .topbar-actions {
+    gap: 6px !important;
+  }
+  .rednote-shell .topbar-actions .ant-btn {
+    font-size: 11px;
+    padding: 0 8px;
+    max-width: 150px;
+    overflow: hidden;
+  }
+  .rednote-shell .page-content {
+    padding: 24px 16px;
+  }
+  .rednote-shell .page-rewrites {
+    padding: 16px 12px;
+  }
+  .workspace-intro h1 > span {
+    font-size: 12px;
+    margin-left: 10px;
+  }
+  .workspace-intro p {
+    font-size: 11px;
+  }
+  .rednote-shell .capture-card {
+    padding: 16px;
+    margin-bottom: 24px;
+  }
+  .rednote-shell .capture-description {
+    font-size: 10px;
+  }
+  .rednote-shell .collection-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .rednote-shell .collection-card-preview {
+    aspect-ratio: 1.28;
+  }
+  .rednote-shell .panel-toolbar > .ant-space {
+    display: flex;
+    gap: 8px !important;
+  }
+  .rednote-shell .panel-toolbar > .ant-space > .ant-space-item {
+    min-width: 0;
+    max-width: 100%;
+  }
+  .rednote-shell .panel-toolbar .ant-input-affix-wrapper {
+    max-width: 100%;
+  }
+  .rednote-shell .filter-line > .ant-space {
+    gap: 8px !important;
+  }
+  .admin-nav {
+    margin: 0;
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 3px;
+  }
+  .admin-nav-item {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-height: 52px;
+    padding: 7px 0;
+    font-size: 9px;
+    border-radius: 8px;
+  }
+  .admin-nav-item > span {
+    display: block;
+  }
+  .admin-nav-item > .anticon {
+    display: inline-flex;
+    font-size: 18px;
+  }
+  .admin-main {
+    margin-left: 0;
+    padding: 25px 16px calc(100px + env(safe-area-inset-bottom));
+    width: 100%;
+  }
+  .admin-header {
+    gap: 18px;
+    margin-bottom: 22px;
+  }
+  .admin-header-actions {
+    justify-content: space-between;
+  }
+  .admin-user-chip {
+    margin-left: auto;
+  }
+  .admin-heading h1 {
+    font-size: 27px;
+  }
+  .admin-overview-filter > span {
+    font-size: 10px;
+  }
+  .admin-panel,
+  .admin-page-card,
+  .usage-panel {
+    padding: 16px;
+  }
+  .admin-overview-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .admin-metric-label > .anticon {
+    width: 24px;
+    height: 24px;
+  }
+  .admin-ocr-group .admin-model-group-head {
+    display: grid;
+    grid-template-columns: 34px minmax(0, 1fr) auto;
+  }
+  .admin-ocr-group .admin-model-group-head > .ant-btn {
+    grid-column: 1 / -1;
+    justify-self: stretch;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition: none !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
+
+/* Standalone collection column settings. */
+.collection-column-options {
+  max-height: min(430px, calc(100dvh - 160px));
+  overflow: auto;
+  width: min(280px, calc(100vw - 56px));
+  padding: 6px;
+}
+.collection-column-options > strong {
+  font-size: 15px;
+  color: #35382f;
+}
+.collection-column-options .ant-checkbox-group {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 12px;
+}
+.reference-design .rewrite-flowbar {
+  position: sticky;
+  top: -4px;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin: 0 0 24px;
+  padding: 16px 18px;
+  border: 1px solid #e1e5d9;
+  border-radius: 12px;
+  background: #f6f8f1;
+  box-shadow: 0 5px 16px #343c2910;
+}
+.rewrite-flow-status {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+}
+.rewrite-flow-status > strong {
+  font-size: 13px;
+  color: #394734;
+  line-height: 1.5;
+}
+.rewrite-flow-status > small {
+  font-size: 11px;
+  color: #727c6b;
+  overflow-wrap: anywhere;
+}
+.rewrite-flow-status > .sync-error {
+  color: #b14c40;
+}
+.rewrite-flow-status > button {
+  justify-self: start;
+}
+.rewrite-progress {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  color: #959b90;
+  font-size: 11px;
+  margin-bottom: 3px;
+}
+.rewrite-progress .is-current {
+  color: #a64831;
+  font-weight: 600;
+}
+.rewrite-progress .is-done {
+  color: #536a47;
+}
+.reference-design .reference-panel {
+  order: 0;
+  border-color: #e3e4de;
+  background: #f7f8f4;
+  border-radius: 12px;
+}
+.reference-design .reference-panel summary {
+  color: #5c6855;
+}
+.reference-design .writing-panel {
+  order: 1;
+}
+.reference-design .writing-panel > .section-heading {
+  display: flex;
+  padding: 0 0 16px;
+}
+.reference-design .draft-editor-heading {
+  display: grid;
+  gap: 7px;
+  border-bottom: 1px solid #e7e7df;
+  padding: 0 0 18px;
+  margin-bottom: 22px;
+}
+.draft-editor-heading > strong {
+  font-size: 17px;
+  color: #35382f;
+}
+.draft-editor-heading > small {
+  font-size: 12px;
+  line-height: 1.7;
+  color: #8b8e82;
+}
+@media (max-width: 700px) {
+  .rednote-shell .panel-toolbar > .collection-primary-tools {
+    display: grid;
+    grid-template-columns: minmax(100px, 1fr) auto auto;
+    width: 100%;
+    gap: 8px !important;
+  }
+  .collection-primary-tools > .ant-space-item:first-child,
+  .collection-primary-tools.is-trash > .ant-space-item:nth-child(2) {
+    grid-column: 1 / -1;
+  }
+  .collection-primary-tools .ant-input-affix-wrapper,
+  .collection-primary-tools .ant-select {
+    width: 100% !important;
+  }
+  .collection-primary-tools .ant-segmented-item-label {
+    min-width: 28px;
+    padding: 0 7px;
+  }
+  .reference-design .rewrite-flowbar {
+    align-items: stretch;
+    gap: 12px;
+    padding: 13px;
+    flex-direction: column;
+    top: 0;
+  }
+  .reference-design .rewrite-flowbar > .ant-btn {
+    width: 100%;
+  }
+  .rewrite-flow-status > strong {
+    font-size: 12px;
+  }
+  .reference-panel summary span {
+    display: block;
+    margin: 6px 0 0;
+  }
+}
+/* Compact workspace and touch layouts. */
+.workspace-intro .section-eyebrow,
+.workspace-intro h1 > span,
+.workflow-shortcuts,
+.media-page-intro .section-eyebrow {
+  display: none;
+}
+.workspace-intro {
+  padding-bottom: 18px;
+  gap: 12px;
+}
+.workspace-intro h1,
+.media-page-intro h1 {
+  font-size: 26px;
+  margin: 0 0 8px;
+}
+.workspace-intro p,
+.media-page-intro p {
+  margin: 0;
+  font-size: 13px;
+}
+.rednote-shell .capture-card {
+  padding: 20px;
+  margin-bottom: 20px;
+}
+.rednote-shell .capture-title {
+  margin-bottom: 12px;
+}
+.rednote-shell .capture-title > .anticon {
+  width: 34px;
+  height: 34px;
+  font-size: 18px;
+}
+.rednote-shell .capture-title strong {
+  font-size: 15px;
+}
+.rednote-shell #capture-inputs[hidden] {
+  display: none;
+}
+.mobile-project-back {
+  display: none;
+}
+.page-media .media-upload-box:not([open]) {
+  display: none;
+}
+.page-media .media-upload-box > summary[hidden] {
+  display: none;
+}
+.publication-times {
+  display: grid;
+  gap: 5px;
+  color: #777c72;
+}
+.publication-mobile-list {
+  display: grid;
+  gap: 12px;
+}
+.publication-mobile-card {
+  padding: 14px;
+  border: 1px solid #e5e6de;
+  border-radius: 12px;
+  background: #fbfcf6;
+  min-width: 0;
+}
+.publication-card-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  text-align: left;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+}
+.publication-card-content:focus-visible {
+  outline: 2px solid #567958;
+  outline-offset: 4px;
+  border-radius: 6px;
+}
+.publication-card-content .publication-thumbnail {
+  flex: 0 0 58px;
+  width: 58px;
+  height: 72px;
+}
+.publication-card-copy {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+.publication-card-copy > strong {
+  font-size: 14px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.publication-card-copy > small,
+.publication-card-meta > small {
+  font-size: 11px;
+  color: #808477;
+}
+.publication-card-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 12px 0;
+}
+.publication-card-meta .ant-tag {
+  margin: 0;
+}
+.publication-card-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  border-top: 1px solid #eeeee7;
+  padding-top: 8px;
+}
+.publication-card-actions > .ant-btn {
+  min-height: 40px;
+}
+.publication-mobile-list > .ant-pagination {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  row-gap: 10px;
+  padding-top: 8px;
+}
+@media (max-width: 700px) {
+  .workspace-intro {
+    padding-bottom: 14px;
+  }
+  .workspace-intro h1,
+  .media-page-intro h1 {
+    font-size: 23px;
+  }
+  .workspace-intro p {
+    display: none;
+  }
+  .rednote-shell .capture-card.is-collapsed {
+    padding: 0;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+    margin: 0 0 16px;
+  }
+  .capture-toggle {
+    width: 100%;
+    min-height: 42px;
+    margin-bottom: 14px;
+  }
+  .capture-card.is-collapsed .capture-toggle {
+    margin-bottom: 0;
+  }
+  .rednote-shell .capture-card:not(.is-collapsed) {
+    padding: 14px;
+  }
+  .rednote-shell .capture-title > .anticon,
+  .rednote-shell .capture-title .capture-description {
+    display: none;
+  }
+  .rednote-shell .capture-foot {
+    margin-top: 12px;
+  }
+  .mobile-project-back {
+    display: inline-flex;
+    align-self: flex-start;
+    margin-bottom: 12px;
+    min-height: 40px;
+  }
+  .reference-design
+    .rewrite-workspace.has-selected-project
+    > .rewrite-projects {
+    display: none;
+  }
+  .reference-design .rewrite-workspace > .project-rail-resizer {
+    display: none;
+  }
+  .reference-design
+    .rewrite-workspace:not(.has-selected-project)
+    .project-rail-list {
+    max-height: none;
+  }
+  .reference-design .rewrite-workspace.has-selected-project {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .reference-design .rewrite-main {
+    min-width: 0;
+  }
+  .publication-summary {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .publication-summary .publication-stat {
+    padding: 12px;
+    min-height: 0;
+  }
+  .publication-summary .publication-stat strong {
+    font-size: 22px;
+  }
+  .publication-summary .publication-stat span {
+    font-size: 11px;
+  }
+  .publication-filters > .ant-space:first-child {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px !important;
+    width: 100%;
+  }
+  .publication-filters > .ant-space:first-child > .ant-space-item:first-child {
+    grid-column: 1 / -1;
+  }
+  .publication-filters .ant-input-search,
+  .publication-filters .ant-select {
+    width: 100% !important;
+  }
+  .page-publications .table-panel {
+    padding: 12px;
+  }
+  .media-library-heading {
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .media-library-heading h2 {
+    font-size: 16px;
+    white-space: nowrap;
+  }
+  .media-library-heading > .ant-space {
+    justify-content: flex-end;
+  }
+}
+@media (max-width: 560px) {
+  .rednote-shell .sidebar-bottom {
+    display: none;
+  }
+  .rednote-shell .sidebar nav {
+    flex: 1;
+    width: 100%;
+    gap: 6px;
+  }
+  .rednote-shell .sidebar .nav-item {
+    min-height: 52px;
+    font-size: 11px;
+  }
+  .rednote-shell .page-content {
+    padding: 16px 12px 24px;
+  }
+  .rednote-shell .topbar {
+    padding: 10px 12px;
+  }
+}
+@media (max-width: 700px) {
+  .reference-design .rewrite-section-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+  .reference-design .rewrite-section-title {
+    margin: 0;
+    white-space: nowrap;
+  }
+  .reference-design .rewrite-section-header > .ant-space {
+    width: 100%;
+    gap: 8px !important;
+  }
+  .reference-design .rewrite-section-header > .ant-space > .ant-space-item {
+    flex: 1;
+  }
+  .reference-design .rewrite-section-header .ant-btn {
+    width: 100%;
+    padding-inline: 8px;
+  }
+  .reference-design .page-publications .platform-account-card {
+    padding: 14px;
+    margin-bottom: 14px;
+  }
+  .page-publications .account-card-main {
+    gap: 10px;
+    min-height: 0;
+  }
+  .page-publications .account-avatar {
+    display: none;
+  }
+  .page-publications .account-copy > p {
+    display: none;
+  }
+  .page-publications .account-card-actions {
+    grid-template-columns: 36px 128px;
+  }
+  .page-publications .account-action-refresh {
+    grid-column: 1;
+  }
+  .page-publications .account-action-connect {
+    grid-column: 2;
+  }
+  .page-publications .account-card-footer {
+    margin-top: 10px;
+    padding-top: 8px;
+  }
+}
+@media (max-width: 700px) {
+  .collection-columns-popover {
+    position: fixed !important;
+    inset: auto 12px calc(84px + env(safe-area-inset-bottom)) !important;
+    width: auto;
+    max-width: none;
+    transform: none !important;
+  }
+  .collection-columns-popover .ant-popover-arrow {
+    display: none;
+  }
+  .collection-columns-popover .collection-column-options {
+    width: 100%;
+    max-height: min(430px, calc(100dvh - 190px));
+  }
+}
+/* Scrollable note copy and media previews. */
+.collection-copy-scroll {
+  max-height: min(30dvh, 260px);
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  scrollbar-gutter: stable;
+  padding: 12px 14px;
+  margin-bottom: 16px;
+  border: 1px solid #e5e6de;
+  border-radius: 10px;
+  background: #fafaf7;
+}
+.collection-copy-scroll .source-body {
+  margin: 0;
+}
+.collection-copy-scroll:focus-visible {
+  outline: 2px solid #567958;
+  outline-offset: 2px;
+}
+.collection-card-pages {
+  touch-action: auto;
+}
+.collection-card-page video {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: #171917;
+}
+.collection-detail-carousel {
+  aspect-ratio: auto;
+  min-height: 0;
+  margin: 18px 0;
+  padding-bottom: 48px;
+  background: transparent;
+}
+.collection-detail-carousel .collection-card-pages {
+  height: auto;
+  align-items: flex-start;
+}
+.collection-detail-carousel .collection-card-page {
+  height: auto;
+  min-height: 0;
+  background: transparent;
+  align-items: flex-start;
+}
+.collection-detail-carousel .detail-asset {
+  width: 100%;
+  min-width: 0;
+}
+.collection-detail-carousel .ant-image {
+  width: 100%;
+}
+.collection-detail-carousel .ant-image-img,
+.collection-detail-carousel video {
+  width: 100%;
+  height: min(45dvh, 420px);
+  object-fit: contain;
+}
+.collection-detail-carousel .detail-asset > .row-between {
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.collection-detail-carousel .detail-asset > .row-between > .ant-space {
+  flex-wrap: wrap;
+}
+.collection-detail-carousel .collection-card-page-controls {
+  top: auto;
+  bottom: 0;
+  right: 0;
+  transform: none;
+}
+.collection-detail-carousel .collection-card-page-control {
+  width: 40px;
+  height: 40px;
+  font-size: 14px;
+  border: 1px solid #e5e6de;
+}
+@media (max-width: 700px) {
+  .collection-detail-body {
+    padding: 16px !important;
+  }
+  .collection-copy-scroll {
+    max-height: 28dvh;
+  }
+  .collection-detail-carousel .ant-image-img,
+  .collection-detail-carousel video {
+    height: min(38dvh, 320px);
+  }
+}
+.collection-card-preview.is-video-page:not(.collection-detail-carousel)
+  .collection-card-dots {
+  display: none;
+}
+/* Collection curation: compact filters, uncropped media and personal metadata. */
+.rednote-shell .collection-tools-header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 12px;
+}
+.rednote-shell .panel-toolbar > .collection-primary-tools {
+  display: grid;
+  grid-template-columns:
+    minmax(140px, 1.6fr) repeat(2, minmax(96px, 1fr))
+    max-content max-content;
+  width: 100%;
+  gap: 10px;
+  align-items: center;
+}
+.collection-primary-tools .ant-select,
+.collection-primary-tools .ant-input-affix-wrapper {
+  width: 100% !important;
+  min-width: 0;
+}
+.collection-primary-tools > * {
+  min-width: 0;
+}
+.collection-primary-tools > .ant-btn,
+.collection-primary-tools > .ant-segmented {
+  height: 40px;
+}
+.collection-primary-tools .ant-select-selector {
+  padding-inline: 8px !important;
+}
+.collection-primary-tools .ant-select-selection-item {
+  font-size: 12px;
+}
+.rednote-shell .collection-card-page img {
+  object-fit: contain;
+  background: #f1f0ea;
+}
+.collection-card-preview {
+  max-height: 420px;
+}
+.collection-detail-carousel {
+  max-height: none;
+}
+.note-original-topics {
+  color: #8b887e;
+}
+.note-curation {
+  padding: 8px 14px 14px;
+  display: grid;
+  gap: 10px;
+  border-top: 1px solid #eeeee7;
+  margin-top: 8px;
+}
+.note-curation > .ant-select {
+  width: 100%;
+}
+.note-rating {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.note-rating .ant-rate {
+  font-size: 22px;
+  white-space: nowrap;
+}
+.note-rating [role="status"] {
+  font-size: 10px;
+  color: #7d826e;
+  overflow-wrap: anywhere;
+}
+.note-curation .ant-select-selection-item {
+  font-size: 11px;
+}
+.collection-card-body .collection-card-copy {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+  white-space: pre-line;
+  line-height: 1.65;
+  font-size: 13px;
+  margin: 8px 0;
+}
+@media (max-width: 1000px) {
+  .rednote-shell .panel-toolbar > .collection-primary-tools {
+    grid-template-columns: minmax(0, 1fr) 94px 94px;
+    gap: 6px;
+  }
+  .rednote-shell .collection-primary-tools > :first-child {
+    grid-column: 1;
+  }
+  .collection-primary-tools > .ant-segmented {
+    grid-row: 2;
+    grid-column: 3;
+    justify-self: end;
+  }
+  .collection-primary-tools > .ant-btn {
+    grid-row: 2;
+    grid-column: 1 / 3;
+    justify-self: start;
+  }
+  .collection-primary-tools .ant-input {
+    font-size: 12px;
+  }
+  .collection-primary-tools .ant-input-affix-wrapper {
+    padding-inline: 7px;
+  }
+  .collection-primary-tools .ant-select-selection-item {
+    font-size: 11px;
+  }
+}
+@media (max-width: 360px) {
+  .rednote-shell .panel-toolbar > .collection-primary-tools {
+    grid-template-columns: minmax(0, 1fr) 82px 82px;
+    gap: 4px;
+  }
+}
+
+/* Share the same personal tags and ratings in every collection view. */
+.collection-list-curation .note-curation {
+  margin: 0;
+  padding: 2px 0;
+  border: 0;
+  gap: 8px;
+  min-width: 180px;
+}
+.collection-list-curation .note-rating .ant-rate {
+  font-size: 18px;
+}
+.collection-list-curation .note-rating .ant-rate-star {
+  margin-inline-end: 5px;
+}
+.collection-list-curation .note-curation .ant-select {
+  min-width: 180px;
+}
+.collection-detail-body .note-curation {
+  padding-inline: 0;
+}
+@media (max-width: 700px) {
+  .collection-primary-tools .ant-select,
+  .collection-primary-tools .ant-input-affix-wrapper {
+    min-height: 38px;
+  }
+  .note-curation .ant-select {
+    min-height: 36px;
+  }
+}

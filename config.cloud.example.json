@@ -1,0 +1,5 @@
+{
+  "server_url": "http://127.0.0.1:18083",
+  "public_url": "https://your-handoff.example.com",
+  "control_key_file": "C:/private/phone-handoff/control.key"
+}

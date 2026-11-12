@@ -1,0 +1,1225 @@
+:root {
+  --surface-shadow: 0 1px 3px rgb(16 24 40 / 4%), 0 8px 24px rgb(16 24 40 / 4%);
+  --forest-sidebar: #293f36;
+  --forest-sidebar-hover: #3d5148;
+  --forest-ink: #28313b;
+  --forest-muted: #667085;
+  --forest-accent: #2f5d4b;
+  --forest-canvas: #f5f7fa;
+  --forest-paper: #ffffff;
+  --forest-sage: #edf4f0;
+  --forest-line: #e3e8ef;
+  --forest-gold: #2f5d4b;
+  --forest-gold-hover: #3e715d;
+  --forest-gold-active: #244a3b;
+  --button-primary-text: #ffffff;
+  --button-disabled-bg: #edf0f4;
+  --button-disabled-text: #9aa4b2;
+  --rednote-bg: var(--forest-canvas);
+  --rednote-surface: var(--forest-paper);
+  --rednote-panel: #f8fafc;
+  --rednote-line: var(--forest-line);
+  --rednote-line-soft: #edf0f4;
+  --rednote-ink: var(--forest-ink);
+  --rednote-muted: var(--forest-muted);
+  --rednote-accent: var(--forest-accent);
+  --rednote-accent-soft: var(--forest-sage);
+  --rednote-sage: #a4b2ab;
+}
+
+.reference-design {
+  --workspace-bg: var(--forest-canvas);
+  --workspace-line: var(--forest-line);
+  --workspace-blue: var(--forest-accent);
+  --workspace-muted: var(--forest-muted);
+  --workspace-ink: var(--forest-ink);
+}
+
+.admin-sidebar {
+  background: var(--forest-sidebar);
+  border-color: var(--forest-sidebar);
+}
+.rednote-shell .sidebar {
+  inset: 12px auto 12px 12px;
+  width: 208px;
+  padding: 24px 12px 12px;
+  border: 1px solid rgb(255 255 255 / 14%);
+  border-radius: 24px;
+  background:
+    radial-gradient(ellipse at 0 0, rgb(211 233 220 / 15%), transparent 48%),
+    radial-gradient(
+      ellipse at 100% 85%,
+      rgb(168 212 191 / 10%),
+      transparent 42%
+    ),
+    linear-gradient(
+      138deg,
+      transparent 15%,
+      rgb(255 255 255 / 5%) 25%,
+      transparent 38%
+    ),
+    var(--forest-sidebar);
+  box-shadow:
+    inset 1px 1px 0 rgb(255 255 255 / 20%),
+    inset -1px -1px 0 rgb(168 212 191 / 10%),
+    0 8px 24px rgb(27 48 39 / 12%);
+}
+.rednote-shell .main-shell {
+  margin-left: 232px;
+  width: calc(100% - 232px);
+}
+.rednote-shell .sidebar .brand {
+  gap: 10px;
+  padding: 0 4px;
+}
+.rednote-shell .sidebar .brand-mark {
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+}
+.rednote-shell .sidebar .brand strong {
+  font-size: 26px;
+}
+.rednote-shell .sidebar .brand small {
+  color: #b8cac0;
+  font-size: 10px;
+  letter-spacing: 0.5px;
+}
+.rednote-shell .sidebar nav {
+  margin-top: 36px;
+  gap: 8px;
+}
+.rednote-shell .nav-item,
+.admin-nav-item {
+  color: #d8e2dd;
+}
+.admin-nav-item:hover {
+  background: var(--forest-sidebar-hover);
+  color: #ffffff;
+}
+.admin-nav-item.selected {
+  background: var(--forest-sage);
+  color: #293f36;
+}
+.rednote-shell .sidebar .nav-item {
+  min-height: 48px;
+  padding: 10px 12px;
+  gap: 8px;
+  border: 1px solid transparent;
+  border-radius: 24px;
+  font-size: 13px;
+  transition:
+    background 180ms ease,
+    box-shadow 180ms ease,
+    color 180ms ease;
+}
+.rednote-shell .sidebar .nav-item > .anticon {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  flex: 0 0 28px;
+  border-radius: 10px;
+  font-size: 18px;
+}
+.rednote-shell .sidebar .nav-item:hover {
+  background: var(--forest-sidebar-hover);
+  color: #ffffff;
+}
+.rednote-shell .sidebar .nav-item.selected {
+  border-color: rgb(216 226 221 / 20%);
+  color: #ffffff;
+  background: linear-gradient(
+    105deg,
+    rgb(216 226 221 / 20%),
+    rgb(216 226 221 / 7%)
+  );
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 16%),
+    0 4px 12px rgb(12 28 20 / 16%);
+}
+.rednote-shell .sidebar .nav-item.selected > .anticon {
+  color: #d3e9dc;
+  background: rgb(216 226 221 / 12%);
+}
+.rednote-shell .sidebar nav .nav-item.selected::after {
+  content: "";
+  display: block;
+  position: static;
+  flex: 0 0 6px;
+  width: 6px;
+  height: 6px;
+  margin-left: auto;
+  border: solid #d8e2dd;
+  border-width: 1.5px 1.5px 0 0;
+  border-radius: 0;
+  background: none;
+  transform: rotate(45deg);
+}
+.rednote-shell .sidebar .nav-item:focus-visible {
+  outline: 2px solid #a8d4bf;
+  outline-offset: 3px;
+}
+.rednote-shell .sidebar-bottom {
+  padding: 12px 0 0;
+}
+.rednote-shell .sidebar .sidebar-toggle {
+  border-color: rgb(216 226 221 / 10%);
+  background: rgb(216 226 221 / 4%);
+}
+.rednote-shell.sidebar-collapsed .sidebar {
+  width: 64px;
+  padding: 24px 8px 12px;
+}
+.rednote-shell.sidebar-collapsed .main-shell {
+  margin-left: 88px;
+  width: calc(100% - 88px);
+}
+.rednote-shell.sidebar-collapsed .sidebar .brand {
+  justify-content: center;
+  padding: 0;
+}
+.rednote-shell.sidebar-collapsed .sidebar .nav-item {
+  justify-content: center;
+  padding: 8px;
+}
+.rednote-shell.sidebar-collapsed .sidebar nav .nav-item.selected::after {
+  display: none;
+}
+@media (min-width: 561px) and (max-width: 760px) {
+  .rednote-shell .sidebar,
+  .rednote-shell.sidebar-collapsed .sidebar {
+    inset: 8px auto 8px 8px;
+    width: 56px;
+    padding: 20px 4px 8px;
+    border-radius: 20px;
+  }
+  .rednote-shell .main-shell,
+  .rednote-shell.sidebar-collapsed .main-shell {
+    margin-left: 72px;
+    width: calc(100% - 72px);
+  }
+  .rednote-shell .sidebar .brand {
+    justify-content: center;
+    padding: 0;
+  }
+  .rednote-shell .sidebar .nav-item {
+    justify-content: center;
+    padding: 8px;
+  }
+  .rednote-shell .sidebar nav .nav-item.selected::after {
+    display: none;
+  }
+}
+@media (max-width: 560px) {
+  .rednote-shell .sidebar,
+  .rednote-shell.sidebar-collapsed .sidebar {
+    inset: auto 8px 8px;
+    width: calc(100% - 16px);
+    padding: 4px 4px calc(4px + env(safe-area-inset-bottom));
+    border-radius: 20px;
+  }
+  .rednote-shell .main-shell,
+  .rednote-shell.sidebar-collapsed .main-shell {
+    margin-left: 0;
+    width: 100%;
+  }
+  .rednote-shell .sidebar nav {
+    margin-top: 0;
+    gap: 4px;
+  }
+  .rednote-shell .sidebar .nav-item,
+  .rednote-shell.sidebar-collapsed .sidebar .nav-item {
+    padding: 6px 2px;
+    gap: 4px;
+    border-radius: 16px;
+    font-size: 10px;
+  }
+  .rednote-shell .sidebar nav .nav-item.selected::after {
+    display: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rednote-shell .sidebar .nav-item {
+    transition: none;
+  }
+}
+.rednote-shell .brand strong,
+.admin-brand strong {
+  color: #ffffff;
+}
+.brand-period {
+  color: #a8d4bf;
+}
+.rednote-shell .sidebar-version,
+.rednote-shell .workspace-status,
+.admin-sidebar-foot small {
+  color: #b8cac0;
+}
+.rednote-shell .workspace-status i {
+  background: var(--forest-gold);
+}
+.rednote-shell .topbar {
+  background: #ffffff;
+  min-height: 60px;
+  margin: 12px 12px 0 0;
+  padding: 10px 24px;
+  border: 1px solid var(--forest-line);
+  border-radius: 22px;
+  box-shadow:
+    0 4px 16px rgb(27 48 39 / 4%),
+    inset 0 1px 0 #fff;
+  grid-template-columns: minmax(0, 1fr) max-content;
+}
+@media (max-width: 760px) {
+  .rednote-shell .topbar {
+    margin: 8px 8px 0 0;
+    padding-inline: 16px;
+    border-radius: 18px;
+  }
+}
+@media (max-width: 560px) {
+  .rednote-shell .topbar {
+    margin-left: 8px;
+    padding-inline: 12px;
+  }
+}
+.rednote-shell .topbar-wordmark {
+  color: #2f5d4b;
+}
+.rednote-shell .workspace-crumb {
+  color: var(--forest-muted);
+}
+.rednote-shell .main-shell,
+.admin-shell {
+  background: var(--forest-canvas);
+}
+
+.rednote-shell .ant-btn-primary:not(:disabled):not(.ant-btn-dangerous),
+.admin-shell .ant-btn-primary:not(:disabled):not(.ant-btn-dangerous),
+.rednote-login .ant-btn-primary:not(:disabled):not(.ant-btn-dangerous),
+.ant-modal .ant-btn-primary:not(:disabled):not(.ant-btn-dangerous),
+.ant-drawer .ant-btn-primary:not(:disabled):not(.ant-btn-dangerous),
+.workflow-mobile-dock .ant-btn-primary:not(:disabled):not(.ant-btn-dangerous) {
+  background: var(--forest-gold);
+  border-color: var(--forest-gold);
+  color: var(--button-primary-text);
+  box-shadow: none;
+}
+.rednote-shell .ant-btn-primary:not(:disabled):not(.ant-btn-dangerous):hover,
+.admin-shell .ant-btn-primary:not(:disabled):not(.ant-btn-dangerous):hover,
+.rednote-login .ant-btn-primary:not(:disabled):not(.ant-btn-dangerous):hover,
+.ant-modal .ant-btn-primary:not(:disabled):not(.ant-btn-dangerous):hover,
+.ant-drawer .ant-btn-primary:not(:disabled):not(.ant-btn-dangerous):hover,
+.workflow-mobile-dock
+  .ant-btn-primary:not(:disabled):not(.ant-btn-dangerous):hover {
+  background: var(--forest-gold-hover) !important;
+  border-color: var(--forest-gold-hover) !important;
+  color: var(--button-primary-text);
+}
+.rednote-shell .ant-btn-primary:not(:disabled):not(.ant-btn-dangerous):active,
+.admin-shell .ant-btn-primary:not(:disabled):not(.ant-btn-dangerous):active,
+.rednote-login .ant-btn-primary:not(:disabled):not(.ant-btn-dangerous):active,
+.ant-modal .ant-btn-primary:not(:disabled):not(.ant-btn-dangerous):active,
+.ant-drawer .ant-btn-primary:not(:disabled):not(.ant-btn-dangerous):active,
+.workflow-mobile-dock
+  .ant-btn-primary:not(:disabled):not(.ant-btn-dangerous):active {
+  background: var(--forest-gold-active) !important;
+  border-color: var(--forest-gold-active) !important;
+}
+.rednote-shell .ant-btn-primary:disabled,
+.admin-shell .ant-btn-primary:disabled,
+.rednote-login .ant-btn-primary:disabled,
+.ant-modal .ant-btn-primary:disabled,
+.ant-drawer .ant-btn-primary:disabled,
+.workflow-mobile-dock .ant-btn-primary:disabled {
+  background: var(--button-disabled-bg);
+  border-color: var(--forest-line);
+  color: var(--button-disabled-text);
+}
+.rednote-shell .ant-btn-dangerous:not(:disabled),
+.admin-shell .ant-btn-dangerous:not(:disabled) {
+  color: #b14c40;
+}
+.rednote-shell .ant-btn-primary.ant-btn-dangerous:not(:disabled),
+.admin-shell .ant-btn-primary.ant-btn-dangerous:not(:disabled) {
+  background: #b14c40;
+  border-color: #b14c40;
+  color: #fff;
+}
+.rednote-shell .ant-btn-primary.ant-btn-dangerous:not(:disabled):hover,
+.admin-shell .ant-btn-primary.ant-btn-dangerous:not(:disabled):hover {
+  background: #963e34 !important;
+  border-color: #963e34 !important;
+  color: #fff;
+}
+
+.ant-btn.ai-generation-button:not(:disabled),
+.ant-btn.ai-generation-button.ant-btn-loading,
+.ant-btn.ai-generation-button[data-accelerating="true"] {
+  background: var(--forest-gold) !important;
+  color: var(--button-primary-text) !important;
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--forest-gold) 8%, transparent);
+}
+.ant-btn.ai-generation-button:not(:disabled):hover {
+  background: var(--forest-gold-hover) !important;
+  box-shadow: 0 3px 12px color-mix(in srgb, var(--forest-gold) 12%, transparent);
+}
+.ant-btn.ai-generation-button:not(:disabled):active {
+  background: var(--forest-gold-active) !important;
+}
+.ant-btn.ai-generation-button:disabled:not(.ant-btn-loading):not(
+    [data-accelerating="true"]
+  ) {
+  background: var(--button-disabled-bg) !important;
+  color: var(--button-disabled-text) !important;
+}
+.ant-btn.ai-generation-button:focus-visible {
+  outline-color: var(--forest-accent);
+}
+
+.rednote-login.user-login,
+.rednote-login.admin-login,
+.rednote-login .login-panel {
+  background: var(--forest-canvas);
+}
+.rednote-login.user-login .login-story {
+  background: var(--forest-sidebar);
+}
+.rednote-login.admin-login .login-panel {
+  background: var(--forest-paper);
+}
+.rednote-login .login-user-link,
+.rednote-login.admin-login .login-brand strong {
+  color: var(--forest-accent);
+}
+.admin-shell .admin-capability-tabs .ant-segmented-item-selected {
+  background: var(--forest-sage);
+  border-color: #c2d5c9;
+  color: #2f5d4b;
+}
+.publication-stat.selected {
+  background: var(--forest-sage);
+  border-color: #c2d5c9;
+}
+.rednote-shell .collection-grid-empty,
+.rednote-shell .empty-library,
+.rednote-shell .capture-title > .anticon {
+  background: var(--forest-sage);
+}
+.rednote-shell .capture-title > .anticon {
+  color: var(--forest-accent);
+}
+
+button:focus-visible,
+a:focus-visible,
+[role="button"]:focus-visible,
+summary:focus-visible {
+  outline-color: #2f5d4b;
+}
+
+body {
+  background: #f5f7fa;
+  color: #333;
+}
+.rednote-shell .topbar {
+  background: #fff;
+}
+.rednote-shell .workspace-crumb {
+  font-size: 15px;
+  font-weight: 600;
+  color: #344054;
+}
+.rednote-shell .brand .brand-wordmark {
+  font-size: 28px;
+  font-weight: 600;
+  font-style: normal;
+  letter-spacing: -0.03em;
+}
+.rednote-shell .page-content.page-collections {
+  padding: 32px 40px 40px;
+}
+.rednote-shell .capture-card,
+.rednote-shell .collection-card,
+.rednote-shell .table-panel,
+.rednote-shell .workflow-panel,
+.admin-shell .admin-panel,
+.admin-shell .admin-page-card,
+.admin-shell .admin-metric,
+.publication-stat,
+.usage-panel,
+.usage-metric {
+  background: #fff;
+  border-color: var(--forest-line);
+  border-radius: 12px;
+  box-shadow: var(--surface-shadow);
+}
+.rednote-shell .capture-card {
+  padding: 24px;
+  margin-bottom: 24px;
+}
+.rednote-shell .capture-title {
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.rednote-shell .capture-title strong {
+  color: #28313b;
+  font-size: 18px;
+  font-weight: 700;
+}
+.rednote-shell .capture-card textarea {
+  padding: 12px 16px;
+  min-height: 104px;
+  font-size: 14px;
+  line-height: 24px;
+  background: #fff;
+  border-color: #dce2e9;
+}
+.rednote-shell .capture-card textarea::placeholder {
+  color: #6b7785;
+  opacity: 1;
+}
+.rednote-shell .capture-foot {
+  margin-top: 16px;
+  padding: 0;
+}
+.rednote-shell .capture-foot .ant-space {
+  gap: 12px !important;
+}
+.rednote-shell .capture-foot .capture-clear {
+  min-width: 80px;
+  background: transparent;
+  box-shadow: none;
+}
+.rednote-shell .capture-foot .capture-start {
+  min-width: 144px;
+  font-weight: 600;
+  transition:
+    transform 160ms ease,
+    box-shadow 160ms ease,
+    background-color 160ms ease;
+}
+.rednote-shell .capture-foot .capture-start.ant-btn-primary:not(:disabled) {
+  color: #fff;
+  background-color: #2f5d4b;
+  background-image: linear-gradient(
+    180deg,
+    #41745f 0%,
+    #2f5d4b 58%,
+    #284e3f 100%
+  );
+  border-color: #2f5d4b;
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 25%),
+    inset 0 -1px 0 rgb(0 0 0 / 12%),
+    0 3px 0 #203f33,
+    0 7px 14px rgb(47 93 75 / 20%);
+}
+.rednote-shell
+  .capture-foot
+  .capture-start.ant-btn-primary:not(:disabled):hover {
+  background-color: #264e40;
+  background-image: linear-gradient(
+    180deg,
+    #4a806a 0%,
+    #346650 58%,
+    #2b5443 100%
+  );
+  border-color: #264e40;
+  transform: translateY(-1px);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 30%),
+    inset 0 -1px 0 rgb(0 0 0 / 12%),
+    0 4px 0 #203f33,
+    0 9px 18px rgb(47 93 75 / 23%);
+}
+.rednote-shell
+  .capture-foot
+  .capture-start.ant-btn-primary:not(:disabled):active {
+  transform: translateY(2px);
+  box-shadow:
+    inset 0 2px 3px rgb(0 0 0 / 16%),
+    0 1px 0 #203f33,
+    0 2px 5px rgb(47 93 75 / 15%);
+}
+.rednote-shell .capture-foot .capture-start.ant-btn-primary:disabled {
+  color: #fff;
+  background: linear-gradient(180deg, #afc2b8, #94aca0);
+  border-color: #94aca0;
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 32%),
+    0 2px 0 #819b8e,
+    0 4px 8px rgb(47 93 75 / 10%);
+}
+.rednote-shell .ant-btn-primary:not(:disabled):not(.ant-btn-dangerous) {
+  color: #fff;
+}
+.rednote-shell .page-collections .table-panel {
+  padding: 24px;
+}
+.rednote-shell .collection-tools-header.panel-toolbar {
+  padding: 0 0 24px;
+  gap: 16px;
+  border: 0;
+}
+.rednote-shell .collection-tools-header .panel-tabs strong {
+  color: #28313b;
+  font-size: 22px;
+  font-weight: 700;
+}
+.rednote-shell .collection-count-label {
+  color: #8a94a3;
+  font-size: 12px;
+}
+.rednote-shell .collection-primary-tools {
+  gap: 12px;
+}
+.rednote-shell .collection-primary-tools > .ant-input-affix-wrapper,
+.rednote-shell .collection-primary-tools > .ant-select,
+.rednote-shell .collection-primary-tools > .ant-btn,
+.rednote-shell .collection-primary-tools > .ant-segmented {
+  height: 40px;
+  min-height: 40px;
+  border-radius: 8px;
+}
+.rednote-shell .collection-primary-tools .ant-select-selector {
+  border-radius: 8px;
+}
+.rednote-shell .collection-primary-tools input::placeholder,
+.rednote-shell .collection-primary-tools .ant-select-selection-placeholder {
+  color: #6b7785;
+}
+.rednote-shell .collection-primary-tools > .ant-segmented {
+  padding: 3px;
+}
+.rednote-shell .collection-primary-tools .ant-segmented-item {
+  border-radius: 6px;
+}
+.rednote-shell .collection-primary-tools .ant-segmented-item-label {
+  min-height: 32px;
+  line-height: 32px;
+  padding-inline: 10px;
+}
+.rednote-shell .collection-selection-bar {
+  gap: 16px;
+  margin-bottom: 16px;
+}
+.rednote-shell .collection-note-cell {
+  gap: 16px;
+}
+.rednote-shell .collection-note-cover {
+  height: 96px;
+  border-radius: 8px;
+  background: #f2f4f7;
+}
+.rednote-shell .collection-note-open > strong {
+  color: #333;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 24px;
+}
+.rednote-shell .collection-note-meta {
+  gap: 8px;
+}
+.rednote-shell .collection-note-kind,
+.rednote-shell .author-name {
+  color: #667085;
+}
+.rednote-shell .ant-table-thead > tr > th,
+.admin-shell .ant-table-thead > tr > th {
+  background: #f8fafc;
+  color: #475467;
+  font-weight: 600;
+  padding: 16px;
+}
+.rednote-shell .ant-table-tbody > tr > td,
+.admin-shell .ant-table-tbody > tr > td {
+  padding: 16px;
+  color: #333;
+  border-bottom-color: #edf0f4;
+  background: #fff;
+}
+.rednote-shell .ant-table-tbody > tr:nth-child(even) > td {
+  background: #fff;
+}
+.rednote-shell .ant-table-tbody > tr.ant-table-row-selected > td {
+  background: #edf4f0;
+}
+.rednote-shell .ant-table-tbody > tr:hover > td {
+  background: #f7faf8;
+}
+.rednote-shell .collection-card {
+  overflow: hidden;
+  align-self: start;
+}
+.rednote-shell .collection-grid {
+  grid-auto-rows: 1px;
+  column-gap: 16px;
+  row-gap: 0;
+}
+.rednote-shell .collection-card > .collection-card-preview {
+  height: auto;
+  min-height: 0;
+  background: #f2f4f7;
+}
+.rednote-shell .collection-card > .collection-card-preview img {
+  object-fit: cover;
+  object-position: center top;
+  background: #f2f4f7;
+}
+.rednote-shell .collection-card:hover {
+  box-shadow:
+    0 3px 8px rgb(16 24 40 / 5%),
+    0 12px 28px rgb(16 24 40 / 7%);
+}
+.rednote-shell .collection-card-author {
+  padding: 12px;
+  gap: 8px;
+}
+.rednote-shell .collection-card-avatar {
+  width: 28px;
+  height: 28px;
+  font-size: 14px;
+  background: #f2f4f7;
+  color: #667085;
+}
+.rednote-shell .collection-card-author-name {
+  color: #667085;
+  font-size: 12px;
+}
+.rednote-shell .collection-card-actions {
+  gap: 4px;
+}
+.rednote-shell .collection-card-actions > a:hover,
+.rednote-shell .collection-card-actions > button:hover {
+  color: #2f5d4b;
+  background: #edf4f0;
+}
+@media (hover: hover) and (pointer: fine) {
+  .rednote-shell .collection-card-actions {
+    opacity: 0.65;
+    transition: opacity 160ms ease;
+  }
+  .rednote-shell .collection-card:hover .collection-card-actions,
+  .rednote-shell .collection-card:focus-within .collection-card-actions,
+  .rednote-shell .collection-card-actions:has(input:checked) {
+    opacity: 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rednote-shell .collection-card-actions {
+    transition: none;
+  }
+}
+.rednote-shell .collection-card-actions > button.collection-card-delete {
+  color: #8a94a3;
+}
+.rednote-shell .collection-card-actions > button.collection-card-delete:hover {
+  color: #475467;
+  background: #f2f4f7;
+}
+.rednote-shell .collection-card-actions .ant-checkbox-wrapper {
+  margin: 0 0 0 4px;
+}
+.rednote-shell .collection-card-body {
+  padding: 12px 12px 0;
+  min-height: 0;
+  flex: 0;
+  gap: 8px;
+}
+.rednote-shell .collection-card-body strong {
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 700;
+  color: #333;
+}
+.rednote-shell .collection-card-copy {
+  color: #475467;
+  line-height: 20px;
+  margin: 0;
+}
+.collection-card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.collection-card-tags .ant-tag {
+  margin: 0;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  border: 0;
+  border-radius: 4px;
+  padding: 1px 6px;
+  color: #426454;
+  background: #edf4f0;
+  font-size: 12px;
+  line-height: 18px;
+}
+.rednote-shell .collection-card-body .note-original-topics {
+  color: #667085;
+  font-size: 12px;
+  line-height: 20px;
+  margin: 0;
+  -webkit-line-clamp: 2;
+}
+.rednote-shell .collection-card-stats {
+  padding: 12px;
+  gap: 12px;
+  color: #667085;
+  font-size: 12px;
+}
+.rednote-shell .collection-card-footer {
+  display: block;
+  padding: 8px 12px 12px;
+  border-color: #edf0f4;
+  min-height: 0;
+}
+.note-curation-controls {
+  width: 100%;
+  min-width: 0;
+}
+.note-curation-controls > .ant-select {
+  width: 100%;
+}
+.collection-card-footer .note-curation-compact {
+  padding: 0;
+  border: 0;
+  gap: 8px;
+}
+.collection-card-footer .note-curation-compact .note-rating {
+  min-height: 24px;
+  gap: 8px;
+}
+.collection-card-footer .note-curation-compact .ant-rate {
+  font-size: 16px;
+}
+.collection-card-footer .note-curation-compact .ant-rate-star:not(:last-child) {
+  margin-inline-end: 4px;
+}
+.note-rating small:empty {
+  display: none;
+}
+.note-curation-compact .note-curation-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.note-curation-compact .note-curation-controls > .ant-select {
+  flex: 1;
+  width: 0;
+  min-width: 0;
+}
+.note-curation-compact .collection-card-add {
+  flex: 0 0 auto;
+  padding: 4px 0 4px 4px;
+  color: #2f5d4b;
+  font-size: 12px;
+}
+.rednote-shell .collection-grid-empty,
+.rednote-shell .empty-library {
+  background: #f8fafc;
+}
+.rednote-shell .collection-row-actions .ant-btn,
+.rednote-shell .publication-row-actions .ant-btn {
+  padding-inline: 0;
+}
+.rednote-shell .collection-row-actions {
+  gap: 8px !important;
+}
+.rednote-shell .collection-card-copy,
+.rednote-shell .collection-note-dialog-copy {
+  color: #333;
+}
+.rednote-shell .brand-wordmark .brand-spotlight {
+  color: #e0fff0;
+  text-shadow: 0 0 3px #c5e8d6;
+}
+.rednote-shell .collection-grid-pagination {
+  padding-top: 16px;
+}
+.rednote-shell .note-curation .ant-select-selector {
+  background: #fff;
+}
+
+.rewrite-project-rail-desktop {
+  padding-block: 12px;
+}
+.rewrite-project-rail-desktop .rewrite-project-rail {
+  padding: 20px 12px 12px;
+  border: 1px solid #e3e8ef;
+  border-radius: 24px;
+  background: linear-gradient(145deg, #fff 60%, #f5f9f7);
+  box-shadow:
+    inset 0 1px 0 #fff,
+    0 8px 24px rgb(27 48 39 / 6%);
+}
+.rewrite-project-rail .project-rail-title {
+  position: relative;
+  isolation: isolate;
+  width: fit-content;
+  margin: 0 8px 0;
+  color: #344b40;
+  font-family:
+    "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+  font-size: 28px;
+  font-weight: 500;
+  letter-spacing: -0.025em;
+  line-height: 32px;
+}
+.rewrite-project-drawer .project-rail-title {
+  display: none;
+}
+.project-rail-scroll {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+}
+.rewrite-project-rail .project-rail-scroll .project-rail-list {
+  height: 100%;
+  padding-right: 10px;
+  overflow-x: hidden;
+  scrollbar-width: none;
+  overscroll-behavior: contain;
+}
+.project-rail-scroll .project-rail-list::-webkit-scrollbar {
+  display: none;
+}
+.project-scroll-track {
+  position: absolute;
+  inset: 0 0 0 auto;
+  width: 8px;
+}
+.project-scroll-thumb {
+  position: absolute;
+  right: 1px;
+  width: 5px;
+  border-radius: 8px;
+  background: #d6dbdf;
+  touch-action: none;
+  cursor: grab;
+}
+.project-scroll-thumb:hover,
+.project-scroll-thumb:focus-visible,
+.project-scroll-thumb.is-dragging {
+  background: #929daa;
+}
+.project-scroll-thumb:focus-visible {
+  outline: 2px solid #b5c8bd;
+  outline-offset: 2px;
+}
+.project-scroll-thumb.is-dragging {
+  cursor: grabbing;
+}
+.rewrite-project-rail .project-rail-item {
+  border: 1px solid transparent;
+  border-radius: 16px;
+  padding: 12px 8px;
+}
+.rewrite-project-rail .project-rail-item.selected {
+  border-color: #dce9e1;
+  background: linear-gradient(135deg, #edf4f0, #f5f9f7);
+  box-shadow:
+    inset 0 1px 0 #fff,
+    0 3px 8px rgb(27 48 39 / 3%);
+}
+.new-project-name-field {
+  display: grid;
+  gap: 12px;
+  padding-block: 16px;
+}
+.new-project-name-field small {
+  color: #b45348;
+}
+.rednote-shell .page-media .embedded-workspace {
+  background: #fff;
+  border-color: #e3e8ef;
+  box-shadow: var(--surface-shadow);
+}
+.rednote-shell .page-media .empty-library {
+  background: #fff;
+}
+.note-tag-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.note-tag-option > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.note-tag-option > button {
+  display: grid;
+  place-items: center;
+  flex: 0 0 24px;
+  height: 24px;
+  padding: 0;
+  color: #8a94a3;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  font-size: 10px;
+}
+.note-tag-option > button:hover,
+.note-tag-option > button:focus-visible {
+  color: #344054;
+  background: #e8edf2;
+}
+@property --capture-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+.capture-start.ant-btn {
+  position: relative;
+  isolation: isolate;
+}
+.capture-start.ant-btn::before {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  padding: 1.5px;
+  border-radius: inherit;
+  pointer-events: none;
+  background: conic-gradient(
+    from var(--capture-angle),
+    #74bea0,
+    #8baee4,
+    #c8a5d8,
+    #ddbd88,
+    #74bea0
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0.8;
+}
+.capture-start.capture-active.ant-btn::before {
+  animation: capture-border-orbit 2.8s linear infinite;
+  opacity: 1;
+}
+.capture-start.ant-btn:disabled:not(.capture-active)::before {
+  opacity: 0.55;
+}
+@keyframes capture-border-orbit {
+  to {
+    --capture-angle: 360deg;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rednote-shell .capture-foot .capture-start {
+    transition: none;
+  }
+  .rednote-shell
+    .capture-foot
+    .capture-start.ant-btn-primary:not(:disabled):hover,
+  .rednote-shell
+    .capture-foot
+    .capture-start.ant-btn-primary:not(:disabled):active {
+    transform: none;
+  }
+  .capture-start.capture-active.ant-btn::before {
+    animation: none;
+  }
+}
+.rednote-shell .workflow-panel h2,
+.admin-shell .admin-heading h1 {
+  color: #28313b;
+  font-weight: 700;
+}
+.rednote-shell .title-original-copy {
+  background: #f8fafc;
+  border-color: #e3e8ef;
+  color: #333;
+}
+
+@media (min-width: 1600px) {
+  .rednote-shell .page-content.page-collections {
+    padding-inline: 64px;
+  }
+}
+@media (max-width: 1000px) {
+  .rednote-shell .page-content.page-collections {
+    padding-inline: 32px;
+  }
+}
+@media (max-width: 700px) {
+  .rednote-shell .page-content.page-collections {
+    padding: 24px 16px 32px;
+  }
+  .rednote-shell .capture-card,
+  .rednote-shell .page-collections .table-panel {
+    padding: 16px;
+  }
+  .rednote-shell .capture-card {
+    margin-bottom: 24px;
+  }
+  .rednote-shell .collection-tools-header.panel-toolbar {
+    padding-bottom: 16px;
+  }
+  .rednote-shell .panel-toolbar > .collection-primary-tools {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .rednote-shell .collection-primary-tools > :first-child {
+    grid-column: 1 / -1;
+  }
+  .rednote-shell .collection-primary-tools > .ant-btn {
+    grid-row: 3;
+    grid-column: 1;
+  }
+  .rednote-shell .collection-primary-tools > .ant-segmented {
+    grid-row: 3;
+    grid-column: 2;
+  }
+  .rednote-shell .collection-primary-tools .ant-select-selection-item {
+    font-size: 12px;
+  }
+  .rednote-shell .responsive-record-table .ant-table-tbody > tr.ant-table-row {
+    background: #fff;
+    border-color: #e3e8ef;
+    padding: 16px;
+    gap: 8px 16px;
+  }
+  .rednote-shell .collection-tools-header .panel-tabs strong {
+    font-size: 20px;
+  }
+  .rednote-shell .capture-title strong {
+    font-size: 17px;
+  }
+}
+
+.workspace-error-details {
+  margin-top: 8px;
+}
+.media-upload-modal .ant-modal-content {
+  padding: 24px;
+  border-radius: 20px;
+}
+.media-upload-category {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+  margin: 20px 0 16px;
+  color: #475467;
+}
+.media-upload-category .ant-select {
+  width: 100%;
+}
+.media-upload-modal .ant-upload-drag {
+  padding: 16px;
+  background: #f8fafc;
+  border-color: #cdd8d2;
+}
+.media-upload-modal .ant-upload-list {
+  max-height: 200px;
+  overflow-y: auto;
+}
+.workspace-error-details summary {
+  cursor: pointer;
+}
+.workspace-error-details code {
+  display: block;
+  margin-top: 8px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-size: 12px;
+}
+
+.rednote-shell .media-copy-context,
+.rednote-shell .media-copy-context > h3 {
+  background: transparent;
+  box-shadow: none;
+  text-shadow: none;
+}
+
+.rednote-shell .page-content.page-publications {
+  padding-inline: clamp(28px, 3.5vw, 64px);
+}
+.publication-note strong {
+  overflow-wrap: anywhere;
+}
+.publication-platform-badge.ant-tag {
+  border: 0;
+  margin-top: 4px;
+  padding: 1px 7px;
+  border-radius: 5px;
+  font-size: 11px;
+  font-weight: 600;
+}
+.publication-platform-badge.is-douyin.ant-tag {
+  background: #17191d;
+  color: #fff;
+}
+.publication-platform-mark {
+  margin-right: 4px;
+  font-size: 14px;
+  text-shadow:
+    -1px -1px #25f4ee,
+    1px 1px #fe2c55;
+}
+.publication-platform-badge.is-xhs.ant-tag {
+  background: #ff2442;
+  color: #fff;
+  letter-spacing: 0.3px;
+}
+@media (max-width: 700px) {
+  .rednote-shell .page-content.page-publications {
+    padding-inline: 16px;
+  }
+}
+
+.rednote-shell .usage-toolbar .ant-segmented {
+  background: #eaf1ec;
+}
+.rednote-shell .usage-toolbar .ant-segmented-item-selected {
+  color: #315e49;
+  background: #fff;
+}
+.rednote-shell .usage-summary-card {
+  background: #fff;
+  border-color: #dce7df;
+}
+.rednote-shell .usage-summary-card.primary {
+  background: #e6f0e9;
+}
+.rednote-shell .usage-summary-card > span {
+  color: #60756a;
+}
+.rednote-shell .usage-summary-card > strong {
+  color: #294636;
+}
+.rednote-shell .usage-summary-card > small {
+  color: #82948a;
+}
+.rednote-shell .usage-price-pill {
+  background: #f7faf8;
+  border-color: #dce7df;
+  color: #6d8275;
+}
+.rednote-shell .usage-price-pill strong {
+  color: #375945;
+}
+.rednote-shell .usage-bar-output,
+.rednote-shell .usage-legend .legend-output {
+  background: #9cbba8;
+}
+.rednote-shell .settings-page .client-settings {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 480px;
+  margin-inline: auto;
+  padding: 28px;
+}
+@media (max-width: 600px) {
+  .rednote-shell .settings-page .client-settings {
+    padding: 20px;
+  }
+}

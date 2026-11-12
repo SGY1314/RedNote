@@ -1,0 +1,5 @@
+CREATE TABLE IF NOT EXISTS creation_workflows (id TEXT PRIMARY KEY, data TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS title_generations (id TEXT PRIMARY KEY, data TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS copy_generations (id TEXT PRIMARY KEY, data TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS image_plans (id TEXT PRIMARY KEY, data TEXT NOT NULL);
+INSERT OR IGNORE INTO schema_migrations VALUES (7, datetime('now'));

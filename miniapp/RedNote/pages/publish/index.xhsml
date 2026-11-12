@@ -1,0 +1,69 @@
+<view class="page publish-page {{editorError || editorMessage ? 'has-publish-feedback' : ''}}">
+  <view xhs:if="{{status === 'loading'}}" class="loading-view">
+    <view class="skeleton skeleton-media"></view><view class="skeleton skeleton-line"></view><view class="skeleton skeleton-line short"></view>
+    <view class="muted loading-label">正在加载参考笔记…</view>
+  </view>
+  <view xhs:elif="{{snapshot && !isError}}" class="preview-content">
+    <view class="surface resource-card">
+      <view class="card-heading"><text>素材资源</text><text class="field-count">{{mediaCount}} {{media[0].isVideo ? '个视频' : '张图片'}} · 按素材顺序展示</text></view>
+      <scroll-view class="resource-scroll {{media[0].isVideo ? 'video-resource' : ''}}" scroll-x="{{true}}">
+        <view class="resource-row">
+          <view xhs:for="{{media}}" xhs:key="asset_id" class="resource-item {{item.isVideo ? 'is-video' : ''}}">
+            <view xhs:if="{{item.placeholder}}" class="resource-placeholder"><text>!</text><text>加载失败</text></view>
+            <video xhs:elif="{{item.isVideo}}" class="resource-video" src="{{item.preview_url}}" controls="{{true}}" autoplay="{{false}}" bindloadedmetadata="onMediaLoaded" binderror="onMediaError" data-index="{{index}}" data-asset="{{item.asset_id}}" data-url="{{item.preview_url}}" />
+            <image xhs:else class="resource-image" src="{{item.display_url || item.preview_url}}" mode="aspectFill" bindload="onMediaLoaded" binderror="onMediaError" bindtap="openGallery" data-index="{{index}}" data-asset="{{item.asset_id}}" data-url="{{item.preview_url}}" />
+          </view>
+        </view>
+      </scroll-view>
+      <view xhs:if="{{referenceMode}}" class="reference-note muted">参考示例 · 原创 AI 配图</view>
+    </view>
+    <view class="publish-tip">
+      <view class="tip-heading"><view class="tip-heading-title"><text class="tip-symbol">!</text><text>发布提示</text></view><text class="tip-copy-status {{copyState === 'copied' ? 'tip-copied' : ''}}">{{publishCopyBusy ? '正在复制…' : copyState === 'copied' ? '文案已复制' : copyError ? '待手动复制' : '准备文案'}}</text></view>
+      <view class="tip-description">{{copyState === 'copied' ? '标题、正文和话题已复制到剪贴板。' : copyError ? '自动复制未完成，可点击下方“一键复制文案”重试。' : '进入页面后自动复制标题、正文和话题。'}}进入小红书发布页后，如文字未带入，长按粘贴即可。</view>
+    </view>
+    <view class="surface editor-card">
+      <view class="editor-field">
+        <view class="card-heading"><text>标题</text><text class="field-count {{titleCount > 20 ? 'invalid-count' : ''}}">{{titleCount}}字</text></view>
+        <input class="title-input" value="{{draftTitle}}" maxlength="-1" placeholder="添加标题" bindinput="onDraftInput" data-field="draftTitle" disabled="{{busy}}" />
+      </view>
+      <view class="editor-field body-field">
+        <view class="card-heading"><text>正文</text><text class="field-count {{bodyCount > 1000 ? 'invalid-count' : ''}}">{{bodyCount}}/1000</text></view>
+        <textarea class="body-input" value="{{draftBody}}" maxlength="-1" auto-height="{{true}}" placeholder="写下想分享的内容…" bindinput="onDraftInput" data-field="draftBody" disabled="{{busy}}" />
+      </view>
+      <view class="editor-field topics-field">
+        <view class="card-heading"><text>话题标签</text><button class="topics-edit" bindtap="editTopics" disabled="{{busy}}">{{editingTopics ? '完成' : draftTopics.length ? '编辑' : '添加话题'}}</button></view>
+        <view xhs:if="{{draftTopics.length}}" class="topics"><text xhs:for="{{draftTopics}}" xhs:key="*this">#{{item}}</text></view>
+        <input xhs:if="{{editingTopics}}" class="topics-input" value="{{draftTopicsText}}" focus="{{editingTopics}}" maxlength="-1" placeholder="输入话题，用空格分隔" bindinput="onDraftInput" bindconfirm="finishTopics" data-field="draftTopicsText" disabled="{{busy}}" />
+      </view>
+    </view>
+    <button class="secondary copy-action" bindtap="copyDraft" disabled="{{busy || publishCopyBusy}}" loading="{{publishCopyBusy}}">一键复制文案</button>
+    <view class="error copy-error" xhs:if="{{copyError}}">{{copyError}}</view>
+    <view class="edit-note muted">内容可自由修改 · 请记录真实探店体验</view>
+    <button class="link back-home" bindtap="goHome">返回首页</button>
+  </view>
+  <view xhs:else class="empty-state {{isError ? 'is-error' : ''}}">
+    <view class="empty-mark">{{isError ? '!' : '✓'}}</view><view class="empty-title">{{statusTitle}}</view>
+    <view class="muted empty-description">{{statusDescription}}</view>
+    <button xhs:if="{{status === 'error'}}" class="primary" bindtap="retry" disabled="{{busy}}">重新加载</button>
+    <button class="link" bindtap="goHome">返回首页</button>
+  </view>
+  <view xhs:if="{{snapshot && !isError}}" class="publish-footer">
+    <view class="footer-content">
+      <view class="error action-error" xhs:if="{{editorMessage}}">{{editorMessage}}</view>
+      <view xhs:if="{{editorCheckEnabled && (canClaim || canOpen)}}" class="editor-entry">
+        <view class="native-publish-entry" hidden="{{!officialAvailable}}"><post-note-button xhs:if="{{officialMounted}}" type="default" size="large" title="{{officialTitle}}" content="{{officialContent}}" tags="{{officialTags}}" media-info="{{officialMediaInfo}}" binderror="onOfficialError"><view class="native-publish-label"><text class="publish-plus">＋</text><text>发小红书</text></view></post-note-button></view>
+        <button xhs:if="{{!officialAvailable}}" class="primary footer-button" loading="{{busy || editorBusy || (allImagesReady && !editorError)}}" disabled="{{true}}"><text class="publish-plus">＋</text> 发小红书</button>
+        <view xhs:if="{{!allImagesReady}}" class="action-hint muted">素材加载完成后即可发布</view>
+      </view>
+      <view xhs:else class="action-hint muted">暂时无法发布，请稍后再试</view>
+      <button xhs:if="{{editorError}}" class="link retry-button" bindtap="retryEditor" disabled="{{busy || editorBusy}}">重新尝试</button>
+    </view>
+  </view>
+  <view xhs:if="{{galleryOpen && snapshot && !isError}}" class="gallery">
+    <view class="gallery-heading"><text>{{currentMedia}} / {{mediaCount}}</text><button class="gallery-close" bindtap="closeGallery">关闭</button></view>
+    <swiper class="gallery-swiper" current="{{currentMedia - 1}}" bindchange="onMediaChange">
+      <swiper-item xhs:for="{{media}}" xhs:key="asset_id"><image class="gallery-image" src="{{item.display_url || item.preview_url}}" mode="aspectFit" /></swiper-item>
+    </swiper>
+    <view class="gallery-hint">左右滑动查看图片</view>
+  </view>
+</view>

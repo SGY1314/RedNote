@@ -1,0 +1,2084 @@
+--- a/app_server.go
++++ b/app_server.go
+@@ -37,6 +37,7 @@
+ 
+ // Start 启动服务器
+ func (s *AppServer) Start(port string) error {
++	defer s.xiaohongshuService.editors.close("")
+ 	s.router = setupRoutes(s)
+ 
+ 	s.httpServer = &http.Server{
+--- a/browser/browser.go
++++ b/browser/browser.go
+@@ -1,12 +1,16 @@
++// Workbench fork: modified for local QR publishing (publisher/README.md).
+ package browser
+ 
+ import (
++	"encoding/json"
+ 	"fmt"
+ 	"net/url"
+ 	"strings"
+ 
++	"github.com/go-rod/rod"
++	"github.com/go-rod/rod/lib/launcher"
++	"github.com/go-rod/rod/lib/proto"
+ 	"github.com/sirupsen/logrus"
+-	"github.com/xpzouying/headless_browser"
+ 	"github.com/xpzouying/xiaohongshu-mcp/cookies"
+ )
+ 
+@@ -47,55 +51,56 @@
+ 	return strings.Replace(proxyURL, u.User.String()+"@", cred+"@", 1)
+ }
+ 
+-func NewBrowser(headless bool, options ...Option) *headless_browser.Browser {
++// Workbench uses installed Chrome/Edge directly, with its normal sandbox and
++// a disposable profile. No injected stealth or separate leakless executable.
++type Browser struct {
++	browser  *rod.Browser
++	launcher *launcher.Launcher
++}
++
++func (b *Browser) NewPage() *rod.Page { return b.browser.MustPage() }
++func (b *Browser) Close() {
++	_ = b.browser.Close()
++	b.launcher.Kill()
++	b.launcher.Cleanup()
++}
++
++func NewBrowser(headless bool, options ...Option) *Browser {
+ 	cfg := &browserConfig{}
+ 	for _, opt := range options {
+ 		opt(cfg)
+ 	}
+ 
+-	// 只用内置浏览器，没有别的来源。二进制必须显式传给 go-rod，
+-	// 否则 rod 会自行下载一个默认 Chromium：它不是内置浏览器，也不认识下面
+-	// 这些 flag（未知 flag 被静默忽略，日志照样打印 "fingerprint enabled"），
+-	// 属于无声降级。宁可不启动，也不启动一个不对的浏览器。
+ 	binPath, err := EnsureBrowser()
+ 	if err != nil {
+-		panic(fmt.Sprintf("内置浏览器不可用，拒绝启动: %v", err))
++		panic(fmt.Sprintf("本机浏览器不可用: %v", err))
+ 	}
+-
+-	opts := []headless_browser.Option{
+-		headless_browser.WithHeadless(headless),
+-		// 用内置浏览器的默认配置，不强制 UA。
+-		headless_browser.WithFingerprint(""), // 空 = 按运行 OS 自动：Linux→windows，mac→macos
+-		headless_browser.WithStealthJS(false),
+-		headless_browser.WithLanguage("zh-CN"), // 面向小红书
+-		// 品牌报 Chrome。
+-		// 注：hardware-concurrency 不设，交给 seed 派生。
+-		headless_browser.WithExtraFlags(map[string]string{"fingerprint-brand": "Chrome"}),
+-	}
+-	opts = append(opts, headless_browser.WithChromeBinPath(binPath))
+-
+-	// 代理（由调用方经 Option 传入，env 读取放在入口层）。
++	l := launcher.New().Bin(binPath).Headless(headless).Leakless(false).NoSandbox(false).Set("lang", "zh-CN")
+ 	if cfg.proxy != "" {
+-		opts = append(opts, headless_browser.WithProxy(cfg.proxy))
++		l.Proxy(cfg.proxy)
+ 		logrus.Infof("Using proxy: %s", maskProxyCredentials(cfg.proxy))
+ 	}
+-
+-	// 固定指纹 seed（由调用方经 Option 传入，env 读取放在入口层）。
+-	if cfg.fingerprintSeed > 0 {
+-		opts = append(opts, headless_browser.WithFingerprintSeed(cfg.fingerprintSeed))
+-		logrus.Infof("fingerprint seed pinned: %d", cfg.fingerprintSeed)
++	u, err := l.Launch()
++	if err != nil {
++		panic(fmt.Sprintf("启动本机浏览器失败: %v", err))
+ 	}
+-
+-	// 加载 cookies
+-	cookiePath := cookies.GetCookiesFilePath()
+-	cookieLoader := cookies.NewLoadCookie(cookiePath)
+-
+-	if data, err := cookieLoader.LoadCookies(); err == nil {
+-		opts = append(opts, headless_browser.WithCookies(string(data)))
+-		logrus.Debugf("loaded cookies from filesuccessfully")
+-	} else {
+-		logrus.Warnf("failed to load cookies: %v", err)
++	r := rod.New().ControlURL(u)
++	if err = r.Connect(); err != nil {
++		l.Kill()
++		l.Cleanup()
++		panic("连接本机浏览器失败")
+ 	}
+-
+-	return headless_browser.New(opts...)
++	b := &Browser{browser: r, launcher: l}
++	if data, err := cookies.NewLoadCookie(cookies.GetCookiesFilePath()).LoadCookies(); err == nil {
++		var cks []*proto.NetworkCookie
++		if json.Unmarshal(data, &cks) != nil {
++			b.Close()
++			panic("登录信息格式错误，请重新扫码")
++		}
++		if err = r.SetCookies(proto.CookiesToParams(cks)); err != nil {
++			b.Close()
++			panic("无法加载登录信息，请重新扫码")
++		}
++	}
++	return b
+ }
+--- a/browser/browser_download.go
++++ b/browser/browser_download.go
+@@ -1,3 +1,4 @@
++// Workbench fork: modified for local QR publishing (publisher/README.md).
+ package browser
+ 
+ import (
+@@ -69,6 +70,18 @@
+ // EnsureBrowser 确保本地存在内置浏览器二进制，返回其路径。
+ // 已缓存则直接返回；否则下载 → 校验 SHA256 → 解压。当前平台无预编译二进制时返回 error。
+ func EnsureBrowser() (string, error) {
++	path := os.Getenv("WORKBENCH_BROWSER")
++	if path == "" {
++		return "", fmt.Errorf("请安装 Chrome 或 Edge，并通过工作台启动发布服务")
++	}
++	if info, err := os.Stat(path); err != nil || info.IsDir() {
++		return "", fmt.Errorf("浏览器路径不可用")
++	}
++	return path, nil
++}
++
++// Upstream downloader retained for source attribution; never called by workbench.
++func ensureUpstreamBrowser() (string, error) {
+ 	asset, binName, ok := platformAsset()
+ 	if !ok {
+ 		return "", fmt.Errorf("当前平台 %s/%s 无预编译浏览器，暂不支持", runtime.GOOS, runtime.GOARCH)
+--- a/cookies/cookies.go
++++ b/cookies/cookies.go
+@@ -1,3 +1,4 @@
++// Workbench fork: modified for local QR publishing (publisher/README.md).
+ package cookies
+ 
+ import (
+@@ -49,7 +50,7 @@
+ // v2 从外层对象里取出 cookies 字段；v1 文件本身就是数组，原样返回。
+ func (c *localCookie) LoadCookies() ([]byte, error) {
+ 
+-	data, err := os.ReadFile(c.path)
++	data, err := readSession(c.path)
+ 	if err != nil {
+ 		return nil, errors.Wrap(err, "failed to read cookies from tmp file")
+ 	}
+@@ -64,7 +65,7 @@
+ 
+ // LoadSeed 读取会话绑定的 seed。老格式（裸数组）没有这个值，返回 0。
+ func (c *localCookie) LoadSeed() int {
+-	data, err := os.ReadFile(c.path)
++	data, err := readSession(c.path)
+ 	if err != nil {
+ 		return 0
+ 	}
+@@ -112,7 +113,7 @@
+ 		}
+ 	}
+ 
+-	return os.WriteFile(c.path, data, 0644)
++	return writeSession(c.path, data)
+ }
+ 
+ // DeleteCookies 删除 cookies 文件。
+--- /dev/null
++++ b/cookies/crypto_other.go
+@@ -0,0 +1,71 @@
++//go:build !windows
++
++package cookies
++
++import (
++	"crypto/aes"
++	"crypto/cipher"
++	"crypto/rand"
++	"encoding/base64"
++	"errors"
++	"os"
++	"strings"
++)
++
++// Linux deployments provide a separate 32-byte, owner-only master key.
++// It must be backed up with the database and must never be regenerated on restart.
++func secretCipher() (cipher.AEAD, error) {
++	path := os.Getenv("WORKBENCH_KEY_FILE")
++	if path == "" {
++		return nil, errors.New("请配置服务器密钥文件 WORKBENCH_KEY_FILE")
++	}
++	info, err := os.Lstat(path)
++	if err != nil || !info.Mode().IsRegular() || info.Mode().Perm()&0077 != 0 {
++		return nil, errors.New("服务器密钥文件不存在或权限不安全（需 0600）")
++	}
++	key, err := os.ReadFile(path)
++	if err != nil || len(key) != 32 {
++		return nil, errors.New("服务器密钥文件无效，需 32 字节")
++	}
++	block, err := aes.NewCipher(key)
++	if err != nil {
++		return nil, err
++	}
++	return cipher.NewGCM(block)
++}
++func Seal(s string) (string, error) {
++	if s == "" {
++		return "", nil
++	}
++	box, err := secretCipher()
++	if err != nil {
++		return "", err
++	}
++	nonce := make([]byte, box.NonceSize())
++	if _, err = rand.Read(nonce); err != nil {
++		return "", err
++	}
++	encrypted := box.Seal(nonce, nonce, []byte(s), []byte("workbench-secret-v1"))
++	return "aesgcm:v1:" + base64.StdEncoding.EncodeToString(encrypted), nil
++}
++func Unseal(s string) (string, error) {
++	if s == "" {
++		return "", nil
++	}
++	if !strings.HasPrefix(s, "aesgcm:v1:") {
++		return "", errors.New("不支持该密钥格式；Windows 密钥和登录状态需在服务器重新配置")
++	}
++	box, err := secretCipher()
++	if err != nil {
++		return "", err
++	}
++	data, err := base64.StdEncoding.DecodeString(strings.TrimPrefix(s, "aesgcm:v1:"))
++	if err != nil || len(data) < box.NonceSize()+box.Overhead() {
++		return "", errors.New("加密数据无效")
++	}
++	plain, err := box.Open(nil, data[:box.NonceSize()], data[box.NonceSize():], []byte("workbench-secret-v1"))
++	if err != nil {
++		return "", errors.New("解密失败，请检查原服务器密钥文件")
++	}
++	return string(plain), nil
++}
+--- /dev/null
++++ b/cookies/crypto_windows.go
+@@ -0,0 +1,49 @@
++// Workbench fork: modified for local QR publishing (publisher/README.md).
++//go:build windows
++
++package cookies
++
++import (
++	"encoding/base64"
++	"fmt"
++	"syscall"
++	"unsafe"
++)
++
++type blob struct {
++	Size uint32
++	Data *byte
++}
++
++var crypt = syscall.NewLazyDLL("crypt32.dll")
++var kernel = syscall.NewLazyDLL("kernel32.dll")
++
++func protect(input []byte, decrypt bool) ([]byte, error) {
++	if len(input) == 0 {
++		return nil, nil
++	}
++	in := blob{uint32(len(input)), &input[0]}
++	var out blob
++	name := "CryptProtectData"
++	if decrypt {
++		name = "CryptUnprotectData"
++	}
++	ok, _, err := crypt.NewProc(name).Call(uintptr(unsafe.Pointer(&in)), 0, 0, 0, 0, 1, uintptr(unsafe.Pointer(&out)))
++	if ok == 0 {
++		return nil, fmt.Errorf("Windows DPAPI 失败: %v", err)
++	}
++	defer kernel.NewProc("LocalFree").Call(uintptr(unsafe.Pointer(out.Data)))
++	return append([]byte(nil), unsafe.Slice(out.Data, out.Size)...), nil
++}
++func Seal(s string) (string, error) {
++	b, e := protect([]byte(s), false)
++	return base64.StdEncoding.EncodeToString(b), e
++}
++func Unseal(s string) (string, error) {
++	b, e := base64.StdEncoding.DecodeString(s)
++	if e != nil {
++		return "", e
++	}
++	b, e = protect(b, true)
++	return string(b), e
++}
+--- /dev/null
++++ b/cookies/session_secure.go
+@@ -0,0 +1,20 @@
++// Workbench fork: Windows DPAPI protects persisted login credentials.
++package cookies
++
++import "os"
++
++func readSession(path string) ([]byte, error) {
++	b, e := os.ReadFile(path)
++	if e != nil {
++		return nil, e
++	}
++	s, e := Unseal(string(b))
++	return []byte(s), e
++}
++func writeSession(path string, data []byte) error {
++	s, e := Seal(string(data))
++	if e != nil {
++		return e
++	}
++	return os.WriteFile(path, []byte(s), 0600)
++}
+--- /dev/null
++++ b/cookies/workbench_test.go
+@@ -0,0 +1,31 @@
++// Workbench fork: modified for local QR publishing (publisher/README.md).
++package cookies
++
++import (
++	"bytes"
++	"encoding/json"
++	"os"
++	"path/filepath"
++	"testing"
++)
++
++func TestWorkbenchDPAPISession(t *testing.T) {
++	p := filepath.Join(t.TempDir(), "session.dpapi")
++	c := NewLoadCookie(p)
++	data := []byte(`[{"name":"session","value":"private-test-token"}]`)
++	if err := c.SaveCookies(data); err != nil {
++		t.Fatal(err)
++	}
++	raw, _ := os.ReadFile(p)
++	if bytes.Contains(raw, []byte("private-test-token")) {
++		t.Fatal("session stored in plaintext")
++	}
++	got, err := c.LoadCookies()
++	var compact bytes.Buffer
++	if err != nil || json.Compact(&compact, got) != nil || !bytes.Equal(compact.Bytes(), data) {
++		t.Fatal("session roundtrip failed", err)
++	}
++	if err := c.DeleteCookies(); err != nil {
++		t.Fatal(err)
++	}
++}
+--- a/handlers_api.go
++++ b/handlers_api.go
+@@ -100,7 +100,7 @@
+ 		return
+ 	}
+ 
+-	respondSuccess(c, result, "发布成功")
++	respondSuccess(c, result, "已准备，请在官方窗口预览并手动发布")
+ }
+ 
+ // publishVideoHandler 发布视频内容
+@@ -119,7 +119,7 @@
+ 		return
+ 	}
+ 
+-	respondSuccess(c, result, "视频发布成功")
++	respondSuccess(c, result, "已准备，请在官方窗口预览并手动发布")
+ }
+ 
+ // listFeedsHandler 获取Feeds列表
+--- a/login_session.go
++++ b/login_session.go
+@@ -1,6 +1,10 @@
++// Workbench fork: modified for local QR publishing (publisher/README.md).
+ package main
+ 
+-import "sync"
++import (
++	"sync"
++	"time"
++)
+ 
+ // loginSessions 管理「已发出二维码、还在等扫码」的登录会话。
+ //
+@@ -8,9 +12,11 @@
+ // 但没有任何东西拦着重复调用，于是每调一次就多一个浏览器活到超时为止。
+ // 这里的约束是：同一时刻只保留一个待扫码会话，开新的就把旧的关掉。
+ type loginSessions struct {
+-	mu     sync.Mutex
+-	seq    uint64
+-	cancel func()
++	mu      sync.Mutex
++	seq     uint64
++	cancel  func()
++	status  LoginStatusResponse
++	updated time.Time
+ }
+ 
+ // start 结束上一个待扫码会话（如果有），登记新的，返回本次会话的序号。
+@@ -21,6 +27,8 @@
+ 	l.seq++
+ 	seq := l.seq
+ 	l.cancel = cancel
++	l.status = LoginStatusResponse{State: "waiting_scan", ExpiresAt: time.Now().Add(4 * time.Minute).UTC().Format(time.RFC3339)}
++	l.updated = time.Now()
+ 	l.mu.Unlock()
+ 
+ 	// 放到锁外调用：取消动作会触发对方 goroutine 的收尾，避免相互等待
+@@ -40,3 +48,42 @@
+ 		l.cancel = nil
+ 	}
+ }
++
++// snapshot returns the actual observed QR state rather than a hardcoded false.
++// Success is cached briefly; later checks revalidate the persisted session.
++func (l *loginSessions) snapshot() *LoginStatusResponse {
++	l.mu.Lock()
++	defer l.mu.Unlock()
++	if l.status.State == "" || (l.cancel == nil && l.status.IsLoggedIn && time.Since(l.updated) > 30*time.Second) {
++		return nil
++	}
++	v := l.status
++	return &v
++}
++func (l *loginSessions) update(seq uint64, state, message string) {
++	l.mu.Lock()
++	defer l.mu.Unlock()
++	if l.seq != seq {
++		return
++	}
++	l.status.State, l.status.Message = state, message
++	l.updated = time.Now()
++}
++
++// Persistence and identity publication share the generation guard. A stale QR
++// must never overwrite credentials after logout or a newer login starts.
++func (l *loginSessions) commit(seq uint64, user LoginStatusResponse, save func() error) bool {
++	l.mu.Lock()
++	defer l.mu.Unlock()
++	if l.seq != seq || l.cancel == nil || user.UserID == "" {
++		return false
++	}
++	if err := save(); err != nil {
++		l.status = LoginStatusResponse{State: "failed", Message: "扫码已确认，但登录信息保存失败；请检查文件夹写入权限后重新连接"}
++		l.updated = time.Now()
++		return false
++	}
++	user.IsLoggedIn, user.State = true, "success"
++	l.status, l.updated = user, time.Now()
++	return true
++}
+--- a/login_session_test.go
++++ b/login_session_test.go
+@@ -1,8 +1,11 @@
++// Workbench fork: modified for local QR publishing (publisher/README.md).
+ package main
+ 
+ import (
++	"errors"
+ 	"sync"
+ 	"testing"
++	"time"
+ 
+ 	"github.com/stretchr/testify/assert"
+ )
+@@ -77,3 +80,56 @@
+ 		assert.Len(t, seen, n, "序号必须唯一，否则 finish 会误清别人的登记")
+ 	})
+ }
++
++func TestLoginObservedStatesAndDurableSuccess(t *testing.T) {
++	var l loginSessions
++	seq := l.start(func() {})
++	assert.Equal(t, "waiting_scan", l.snapshot().State)
++	l.update(seq, "verification_required", "请完成验证")
++	assert.False(t, l.snapshot().IsLoggedIn)
++	assert.Equal(t, "verification_required", l.snapshot().State)
++	saves := 0
++	user := LoginStatusResponse{UserID: "0123456789abcdef01234567", Username: "测试账号"}
++	assert.True(t, l.commit(seq, user, func() error { saves++; return nil }))
++	l.finish(seq)
++	assert.Equal(t, 1, saves)
++	assert.True(t, l.snapshot().IsLoggedIn)
++	assert.Equal(t, user.UserID, l.snapshot().UserID)
++	l.updated = time.Now().Add(-31 * time.Second)
++	assert.Nil(t, l.snapshot(), "cached success must be reverified")
++}
++func TestLoginSaveFailureIsNotSuccess(t *testing.T) {
++	var l loginSessions
++	seq := l.start(func() {})
++	assert.False(t, l.commit(seq, LoginStatusResponse{UserID: "0123456789abcdef01234567"}, func() error { return errors.New("private error details") }))
++	l.finish(seq)
++	v := l.snapshot()
++	assert.Equal(t, "failed", v.State)
++	assert.False(t, v.IsLoggedIn)
++	assert.NotContains(t, v.Message, "private")
++	assert.Contains(t, v.Message, "保存失败")
++}
++func TestLoginOldCallbacksCannotReplaceNewOrLoggedOutSession(t *testing.T) {
++	s := NewXiaohongshuService()
++	old := s.logins.start(func() {})
++	newer := s.logins.start(func() {})
++	saves := 0
++	persist := func() error { saves++; return nil }
++	user := LoginStatusResponse{UserID: "0123456789abcdef01234567"}
++	s.logins.update(old, "expired", "旧二维码过期")
++	assert.False(t, s.logins.commit(old, user, persist))
++	assert.Equal(t, "waiting_scan", s.logins.snapshot().State)
++	assert.False(t, s.logins.commit(newer, LoginStatusResponse{}, persist), "identity is required")
++	s.stopLogin()
++	assert.False(t, s.logins.commit(newer, user, persist))
++	assert.Nil(t, s.logins.snapshot())
++	assert.Equal(t, 0, saves)
++}
++func TestLoginExpiryRetainsReason(t *testing.T) {
++	var l loginSessions
++	seq := l.start(func() {})
++	l.update(seq, "expired", "本次扫码已超时")
++	l.finish(seq)
++	assert.Equal(t, "expired", l.snapshot().State)
++	assert.False(t, l.snapshot().IsLoggedIn)
++}
+--- a/main.go
++++ b/main.go
+@@ -1,3 +1,4 @@
++// Workbench fork: modified for local QR publishing (publisher/README.md).
+ package main
+ 
+ import (
+@@ -7,7 +8,6 @@
+ 	"github.com/sirupsen/logrus"
+ 	"github.com/xpzouying/xiaohongshu-mcp/browser"
+ 	"github.com/xpzouying/xiaohongshu-mcp/configs"
+-	"github.com/xpzouying/xiaohongshu-mcp/cookies"
+ )
+ 
+ // version 构建版本号，发布时通过 -ldflags "-X main.version=vX.Y.Z" 注入。
+@@ -27,7 +27,13 @@
+ 		token = os.Getenv("AUTH_TOKEN")
+ 	}
+ 
+-	logrus.Infof("xiaohongshu-mcp version: %s", version)
++	if token == "" {
++		logrus.Fatal("AUTH_TOKEN is required")
++	}
++	if port != "127.0.0.1:18060" {
++		logrus.Fatal("publisher must listen on 127.0.0.1:18060")
++	}
++	logrus.Infof("workbench publisher v2.5.5")
+ 
+ 	// 只用内置浏览器。启动时就备好，缺它直接退出，不拖到第一个请求才失败。
+ 	binPath, err := browser.EnsureBrowser()
+@@ -39,8 +45,6 @@
+ 	configs.InitHeadless(headless)
+ 	// 入口层解析出 seed 和代理，经 configs 透传给浏览器工厂。
+ 	// seed 取值：环境变量 > 会话文件 > 新生成并写回，保证同一账号每次启动一致。
+-	configs.SetFingerprintSeed(configs.ResolveFingerprintSeed(
+-		cookies.NewLoadCookie(cookies.GetCookiesFilePath())))
+ 	configs.SetProxy(configs.ProxyFromEnv())
+ 
+ 	// 初始化服务
+--- /dev/null
++++ b/manual_editor.go
+@@ -0,0 +1,118 @@
++package main
++
++import (
++	"context"
++	"fmt"
++	"sync"
++	"time"
++
++	"github.com/gin-gonic/gin"
++	"github.com/go-rod/rod"
++	"github.com/xpzouying/xiaohongshu-mcp/browser"
++	"github.com/xpzouying/xiaohongshu-mcp/configs"
++)
++
++// Editors outlive preparation requests. Only the user publishes in these windows.
++type manualEditor interface {
++	activate(context.Context) error
++	close()
++}
++
++type visibleEditor struct {
++	browser *browser.Browser
++	page    *rod.Page
++}
++
++func (e *visibleEditor) activate(ctx context.Context) error {
++	_, err := e.page.Context(ctx).Activate()
++	return err
++}
++func (e *visibleEditor) close() { e.browser.Close() }
++
++type manualEditors struct {
++	mu    sync.Mutex
++	items map[string]manualEditor
++}
++
++func (m *manualEditors) focus(ctx context.Context, id string) error {
++	m.mu.Lock()
++	defer m.mu.Unlock()
++	e := m.items[id]
++	if e == nil {
++		return fmt.Errorf("editor_missing")
++	}
++	if err := e.activate(ctx); err != nil {
++		e.close()
++		delete(m.items, id)
++		return fmt.Errorf("editor_missing")
++	}
++	return nil
++}
++
++func (m *manualEditors) close(id string) {
++	m.mu.Lock()
++	defer m.mu.Unlock()
++	for key, e := range m.items {
++		if id == "" || key == id {
++			e.close()
++			delete(m.items, key)
++		}
++	}
++}
++
++func (s *XiaohongshuService) prepareInEditor(ctx context.Context, id, account string, fill func(*rod.Page) error) error {
++	if id == "" {
++		return fmt.Errorf("缺少预发布编辑器标识")
++	}
++	s.editors.mu.Lock()
++	if s.editors.items[id] != nil {
++		s.editors.mu.Unlock()
++		return fmt.Errorf("已有预发布窗口，请先预览或确认未发布后重新准备")
++	}
++	s.editors.mu.Unlock()
++	// A visible, dedicated browser is required even when background jobs use headless mode.
++	b := browser.NewBrowser(false, browser.WithProxy(configs.Proxy()))
++	retained := false
++	defer func() {
++		if !retained {
++			b.Close()
++		}
++	}()
++	page := b.NewPage()
++	s.editors.mu.Lock()
++	if s.editors.items == nil {
++		s.editors.items = map[string]manualEditor{}
++	}
++	s.editors.items[id] = &visibleEditor{browser: b, page: page}
++	retained = true
++	s.editors.mu.Unlock()
++	// Keep even a partially prepared editor open for inspection/manual completion.
++	if err := verifyPublishingAccount(ctx, page, account); err != nil {
++		return err
++	}
++	return fill(page)
++}
++
++func (s *AppServer) manualEditorHandler(c *gin.Context) {
++	var req struct {
++		ID string `json:"editor_id" binding:"required"`
++	}
++	if err := c.ShouldBindJSON(&req); err != nil {
++		respondError(c, 400, "INVALID_REQUEST", "缺少编辑器标识", nil)
++		return
++	}
++	service := s.xiaohongshuService
++	service.prepareMu.Lock()
++	defer service.prepareMu.Unlock()
++	if c.Request.Method == "DELETE" {
++		service.editors.close(req.ID)
++	} else {
++		ctx, cancel := context.WithTimeout(c.Request.Context(), 5*time.Second)
++		defer cancel()
++		if err := service.editors.focus(ctx, req.ID); err != nil {
++			respondError(c, 409, "EDITOR_MISSING", "预发布窗口已关闭，请核实未发布后重新准备", nil)
++			return
++		}
++	}
++	respondSuccess(c, gin.H{"ok": true}, "编辑器操作完成")
++}
+--- /dev/null
++++ b/manual_editor_test.go
+@@ -0,0 +1,102 @@
++package main
++
++import (
++	"context"
++	"errors"
++	"go/ast"
++	"go/parser"
++	"go/token"
++	"os"
++	"path/filepath"
++	"strings"
++	"testing"
++)
++
++type fakeManualEditor struct {
++	closed, activated int
++	err               error
++}
++
++func (e *fakeManualEditor) close()                         { e.closed++ }
++func (e *fakeManualEditor) activate(context.Context) error { e.activated++; return e.err }
++
++func TestManualEditorLifecycle(t *testing.T) {
++	a, b := &fakeManualEditor{}, &fakeManualEditor{}
++	m := manualEditors{items: map[string]manualEditor{"a": a, "b": b}}
++	if err := m.focus(context.Background(), "a"); err != nil || a.activated != 1 || a.closed != 0 {
++		t.Fatal("preview must reuse the open editor")
++	}
++	m.close("a")
++	if a.closed != 1 || b.closed != 0 {
++		t.Fatal("reset closed another draft")
++	}
++	if err := m.focus(context.Background(), "a"); err == nil {
++		t.Fatal("missing editor accepted")
++	}
++	b.err = errors.New("browser closed")
++	if err := m.focus(context.Background(), "b"); err == nil || b.closed != 1 {
++		t.Fatal("closed editor was retained")
++	}
++	m.close("")
++	if a.closed != 1 || b.closed != 1 {
++		t.Fatal("closed twice")
++	}
++}
++
++func TestManualEditorLogoutClosesAll(t *testing.T) {
++	a, b := &fakeManualEditor{}, &fakeManualEditor{}
++	m := manualEditors{items: map[string]manualEditor{"a": a, "b": b}}
++	m.close("")
++	if a.closed != 1 || b.closed != 1 || len(m.items) != 0 {
++		t.Fatal("logout left authenticated editors open")
++	}
++}
++
++// Trace local helper calls: both upload entry points must remain unreachable
++// from the old final-submit helpers, including after future refactoring.
++func TestManualPreparationCannotReachAutomaticSubmission(t *testing.T) {
++	funcs := map[string]*ast.FuncDecl{}
++	entries, err := os.ReadDir("xiaohongshu")
++	if err != nil {
++		t.Fatal(err)
++	}
++	for _, entry := range entries {
++		if !strings.HasSuffix(entry.Name(), ".go") || strings.HasSuffix(entry.Name(), "_test.go") {
++			continue
++		}
++		file, err := parser.ParseFile(token.NewFileSet(), filepath.Join("xiaohongshu", entry.Name()), nil, 0)
++		if err != nil {
++			t.Fatal(err)
++		}
++		for _, decl := range file.Decls {
++			if fn, ok := decl.(*ast.FuncDecl); ok {
++				funcs[fn.Name.Name] = fn
++			}
++		}
++	}
++	for _, root := range []string{"Publish", "PublishVideo"} {
++		if funcs[root] == nil {
++			t.Fatalf("missing preparation entry %s", root)
++		}
++		seen := map[string]bool{}
++		var walk func(string)
++		walk = func(name string) {
++			if name == "clickAndVerifyPublish" || name == "clickPublishButton" || name == "clickPublishWidget" {
++				t.Fatalf("%s can automatically submit via %s", root, name)
++			}
++			if seen[name] || funcs[name] == nil {
++				return
++			}
++			seen[name] = true
++			ast.Inspect(funcs[name].Body, func(n ast.Node) bool {
++				if call, ok := n.(*ast.CallExpr); ok {
++					if ident, ok := call.Fun.(*ast.Ident); ok {
++						walk(ident.Name)
++					}
++				}
++				return true
++			})
++		}
++		walk(root)
++	}
++}
+--- a/routes.go
++++ b/routes.go
+@@ -1,71 +1,35 @@
++// Workbench fork: only local account and publishing endpoints are exposed.
+ package main
+ 
+ import (
++	"github.com/gin-gonic/gin"
+ 	"net/http"
+-
+-	"github.com/gin-gonic/gin"
+-	"github.com/modelcontextprotocol/go-sdk/mcp"
+ )
+ 
+-// setupRoutes 设置路由配置
+-func setupRoutes(appServer *AppServer) *gin.Engine {
+-	// 设置 Gin 模式
++func setupRoutes(s *AppServer) *gin.Engine {
+ 	gin.SetMode(gin.ReleaseMode)
+-
+-	router := gin.New()
+-	router.Use(gin.Logger())
+-	router.Use(gin.Recovery())
+-
+-	// 添加中间件
+-	router.Use(errorHandlingMiddleware())
+-	router.Use(corsMiddleware())
+-
+-	// 健康检查
+-	router.GET("/health", healthHandler)
+-
+-	// MCP 端点 - 使用官方 SDK 的 Streamable HTTP Handler
+-	mcpHandler := mcp.NewStreamableHTTPHandler(
+-		func(r *http.Request) *mcp.Server {
+-			return appServer.mcpServer
+-		},
+-		&mcp.StreamableHTTPOptions{
+-			JSONResponse: true, // 支持 JSON 响应
+-			// 换取客户端可跳过 initialize 握手直接调工具。代价是服务端无法反向
+-			// 请求客户端（sampling / elicitation / roots），眼下一处都没用到；
+-			// 要用得先摘掉这行。
+-			Stateless: true,
+-		},
+-	)
+-	protected := router.Group("")
+-	protected.Use(authMiddleware(appServer.authToken))
+-
+-	protected.Any("/mcp", gin.WrapH(mcpHandler))
+-	protected.Any("/mcp/*path", gin.WrapH(mcpHandler))
+-
+-	// API 路由组
+-	api := protected.Group("/api/v1")
+-	{
+-		api.GET("/login/status", appServer.checkLoginStatusHandler)
+-		api.GET("/login/qrcode", appServer.getLoginQrcodeHandler)
+-		api.DELETE("/login/cookies", appServer.deleteCookiesHandler)
+-		api.POST("/publish", appServer.publishHandler)
+-		api.POST("/publish_video", appServer.publishVideoHandler)
+-		api.GET("/feeds/list", appServer.listFeedsHandler)
+-		api.GET("/feeds/search", appServer.searchFeedsHandler)
+-		api.POST("/feeds/search", appServer.searchFeedsHandler)
+-		api.POST("/feeds/detail", appServer.getFeedDetailHandler)
+-		api.POST("/user/profile", appServer.userProfileHandler)
+-		api.POST("/feeds/comment", appServer.postCommentHandler)
+-		api.POST("/feeds/comment/reply", appServer.replyCommentHandler)
+-		api.POST("/feeds/like", appServer.likeFeedHandler)
+-		api.POST("/feeds/favorite", appServer.favoriteFeedHandler)
+-		api.GET("/user/me", appServer.myProfileHandler)
+-		api.GET("/notifications/unread", appServer.getUnreadCountHandler)
+-		api.GET("/notifications/list", appServer.listNotificationsHandler)
+-		api.POST("/notifications/list", appServer.listNotificationsHandler)
+-		api.POST("/notifications/reply", appServer.replyNotificationHandler)
+-		api.POST("/notifications/like", appServer.likeNotificationHandler)
+-	}
+-
+-	return router
++	r := gin.New()
++	r.Use(gin.Recovery())
++	r.Use(func(c *gin.Context) {
++		if c.GetHeader("Origin") != "" {
++			c.AbortWithStatus(403)
++			return
++		}
++		c.Next()
++	})
++	r.GET("/health", func(c *gin.Context) { c.JSON(200, gin.H{"app": "xhs-workbench-publisher"}) })
++	api := r.Group("/api/v1", authMiddleware(s.authToken))
++	api.Use(func(c *gin.Context) { c.Request.Body = http.MaxBytesReader(c.Writer, c.Request.Body, 2<<20); c.Next() })
++	api.GET("/login/status", s.checkLoginStatusHandler)
++	api.GET("/login/qrcode", s.getLoginQrcodeHandler)
++	api.DELETE("/login/cookies", s.deleteCookiesHandler)
++	api.POST("/prepare", s.publishHandler)
++	api.POST("/prepare_video", s.publishVideoHandler)
++	api.POST("/prepare/editor", s.manualEditorHandler)
++	api.DELETE("/prepare/editor", s.manualEditorHandler)
++	// Legacy routes also prepare only; they must never automatically submit.
++	api.POST("/publish", s.publishHandler)
++	api.POST("/publish_video", s.publishVideoHandler)
++	api.POST("/monitor/own-notes", s.ownNotesHandler)
++	return r
+ }
+--- a/service.go
++++ b/service.go
+@@ -1,3 +1,4 @@
++// Workbench fork: modified for local QR publishing (publisher/README.md).
+ package main
+ 
+ import (
+@@ -5,11 +6,11 @@
+ 	"encoding/json"
+ 	"fmt"
+ 	"os"
++	"sync"
+ 	"time"
+ 
+ 	"github.com/go-rod/rod"
+ 	"github.com/sirupsen/logrus"
+-	"github.com/xpzouying/headless_browser"
+ 	"github.com/xpzouying/xiaohongshu-mcp/browser"
+ 	"github.com/xpzouying/xiaohongshu-mcp/configs"
+ 	"github.com/xpzouying/xiaohongshu-mcp/cookies"
+@@ -20,7 +21,9 @@
+ 
+ // XiaohongshuService 小红书业务服务
+ type XiaohongshuService struct {
+-	logins loginSessions
++	logins    loginSessions
++	prepareMu sync.Mutex
++	editors   manualEditors
+ }
+ 
+ // NewXiaohongshuService 创建小红书服务实例
+@@ -30,18 +33,23 @@
+ 
+ // PublishRequest 发布请求
+ type PublishRequest struct {
+-	Title      string   `json:"title" binding:"required"`
+-	Content    string   `json:"content" binding:"required"`
+-	Images     []string `json:"images" binding:"required,min=1"`
+-	Tags       []string `json:"tags,omitempty"`
+-	ScheduleAt string   `json:"schedule_at,omitempty"` // 定时发布时间，ISO8601格式，为空则立即发布
+-	IsOriginal bool     `json:"is_original,omitempty"` // 是否声明原创
+-	Visibility string   `json:"visibility,omitempty"`  // 可见范围: "公开可见"(默认), "仅自己可见", "仅互关好友可见"
+-	Products   []string `json:"products,omitempty"`    // 商品关键词列表，用于绑定带货商品
++	EditorID       string   `json:"editor_id" binding:"required"`
++	ExpectedUserID string   `json:"expected_user_id"`
++	Title          string   `json:"title" binding:"required"`
++	Content        string   `json:"content" binding:"required"`
++	Images         []string `json:"images" binding:"required,min=1"`
++	Tags           []string `json:"tags,omitempty"`
++	ScheduleAt     string   `json:"schedule_at,omitempty"` // 定时发布时间，ISO8601格式，为空则立即发布
++	IsOriginal     bool     `json:"is_original,omitempty"` // 是否声明原创
++	Visibility     string   `json:"visibility,omitempty"`  // 可见范围: "公开可见"(默认), "仅自己可见", "仅互关好友可见"
++	Products       []string `json:"products,omitempty"`    // 商品关键词列表，用于绑定带货商品
+ }
+ 
+ // LoginStatusResponse 登录状态响应
+ type LoginStatusResponse struct {
++	State      string `json:"state,omitempty"`
++	Message    string `json:"message,omitempty"`
++	ExpiresAt  string `json:"expires_at,omitempty"`
+ 	IsLoggedIn bool   `json:"is_logged_in"`
+ 	Username   string `json:"username,omitempty"` // 当前登录账号的昵称
+ 	UserID     string `json:"user_id,omitempty"`  // 用户唯一标识（个人主页 URL 中的 ID）
+@@ -56,29 +64,35 @@
+ 
+ // PublishResponse 发布响应
+ type PublishResponse struct {
+-	Title   string `json:"title"`
+-	Content string `json:"content"`
+-	Images  int    `json:"images"`
+-	Status  string `json:"status"`
++	Prepared bool   `json:"prepared"`
++	Verified bool   `json:"verified"`
++	Title    string `json:"title"`
++	Content  string `json:"content"`
++	Images   int    `json:"images"`
++	Status   string `json:"status"`
+ }
+ 
+ // PublishVideoRequest 发布视频请求（仅支持本地单个视频文件）
+ type PublishVideoRequest struct {
+-	Title      string   `json:"title" binding:"required"`
+-	Content    string   `json:"content" binding:"required"`
+-	Video      string   `json:"video" binding:"required"`
+-	Tags       []string `json:"tags,omitempty"`
+-	ScheduleAt string   `json:"schedule_at,omitempty"` // 定时发布时间，ISO8601格式，为空则立即发布
+-	Visibility string   `json:"visibility,omitempty"`  // 可见范围: "公开可见"(默认), "仅自己可见", "仅互关好友可见"
+-	Products   []string `json:"products,omitempty"`    // 商品关键词列表，用于绑定带货商品
++	EditorID       string   `json:"editor_id" binding:"required"`
++	ExpectedUserID string   `json:"expected_user_id"`
++	Title          string   `json:"title" binding:"required"`
++	Content        string   `json:"content" binding:"required"`
++	Video          string   `json:"video" binding:"required"`
++	Tags           []string `json:"tags,omitempty"`
++	ScheduleAt     string   `json:"schedule_at,omitempty"` // 定时发布时间，ISO8601格式，为空则立即发布
++	Visibility     string   `json:"visibility,omitempty"`  // 可见范围: "公开可见"(默认), "仅自己可见", "仅互关好友可见"
++	Products       []string `json:"products,omitempty"`    // 商品关键词列表，用于绑定带货商品
+ }
+ 
+ // PublishVideoResponse 发布视频响应
+ type PublishVideoResponse struct {
+-	Title   string `json:"title"`
+-	Content string `json:"content"`
+-	Video   string `json:"video"`
+-	Status  string `json:"status"`
++	Prepared bool   `json:"prepared"`
++	Verified bool   `json:"verified"`
++	Title    string `json:"title"`
++	Content  string `json:"content"`
++	Video    string `json:"video"`
++	Status   string `json:"status"`
+ }
+ 
+ // FeedsListResponse Feeds列表响应
+@@ -96,13 +110,25 @@
+ 
+ // DeleteCookies 删除 cookies 文件，用于登录重置
+ func (s *XiaohongshuService) DeleteCookies(ctx context.Context) error {
+-	cookiePath := cookies.GetCookiesFilePath()
+-	cookieLoader := cookies.NewLoadCookie(cookiePath)
+-	return cookieLoader.DeleteCookies()
++	s.prepareMu.Lock()
++	defer s.prepareMu.Unlock()
++	s.editors.close("")
++	s.logins.mu.Lock()
++	defer s.logins.mu.Unlock()
++	s.logins.seq++
++	s.logins.status = LoginStatusResponse{}
++	if s.logins.cancel != nil {
++		s.logins.cancel()
++		s.logins.cancel = nil
++	}
++	return cookies.NewLoadCookie(cookies.GetCookiesFilePath()).DeleteCookies()
+ }
+ 
+ // CheckLoginStatus 检查登录状态
+ func (s *XiaohongshuService) CheckLoginStatus(ctx context.Context) (*LoginStatusResponse, error) {
++	if snapshot := s.logins.snapshot(); snapshot != nil {
++		return snapshot, nil
++	}
+ 	b := newBrowser()
+ 	defer b.Close()
+ 
+@@ -118,12 +144,14 @@
+ 
+ 	response := &LoginStatusResponse{
+ 		IsLoggedIn: isLoggedIn,
+-	}
+-
+-	// 已登录时从当前页读取真实账号信息；读不到只记 warn，不影响状态返回。
++		State:      "logged_out",
++	}
++
++	// Only report login success with a verified current-account identity.
+ 	if isLoggedIn {
++		response.State = "success"
+ 		if user, err := loginAction.CurrentUser(ctx); err != nil {
+-			logrus.Warnf("failed to get current user info: %v", err)
++			response.IsLoggedIn, response.State, response.Message = false, "failed", "尚未核实账号身份，请重新连接"
+ 		} else {
+ 			response.Username = user.Nickname
+ 			response.UserID = user.UserID
+@@ -135,7 +163,15 @@
+ 
+ // GetLoginQrcode 获取登录的扫码二维码
+ func (s *XiaohongshuService) GetLoginQrcode(ctx context.Context) (*LoginQrcodeResponse, error) {
+-	b := newBrowser()
++	s.stopLogin()
++	// The user must be able to complete official verification in this same session.
++	b := browser.NewBrowser(false, browser.WithProxy(configs.Proxy()))
++	handedOff := false
++	defer func() {
++		if !handedOff {
++			b.Close()
++		}
++	}()
+ 	page := b.NewPage()
+ 
+ 	deferFunc := func() {
+@@ -146,17 +182,20 @@
+ 	loginAction := xiaohongshu.NewLogin(page)
+ 
+ 	img, loggedIn, err := loginAction.FetchQrcodeImage(ctx)
+-	if err != nil || loggedIn {
+-		defer deferFunc()
+-	}
+ 	if err != nil {
+ 		return nil, err
+ 	}
+ 
+ 	timeout := 4 * time.Minute
+ 
++	if loggedIn {
++		if err := saveCookiesContext(ctx, page); err != nil {
++			return nil, fmt.Errorf("登录信息保存失败，请检查工作台目录写入权限")
++		}
++	}
+ 	if !loggedIn {
+ 		s.waitScanInBackground(loginAction, page, deferFunc, timeout)
++		handedOff = true
+ 	}
+ 
+ 	return &LoginQrcodeResponse{
+@@ -187,22 +226,76 @@
+ 		defer cancel()
+ 		defer s.logins.finish(seq)
+ 
+-		if loginAction.WaitForLogin(ctxTimeout) {
+-			if err := saveCookies(page); err != nil {
+-				logrus.Errorf("扫码成功但保存 cookies 失败，会话 #%d: %v", seq, err)
++		defer func() {
++			if recover() != nil {
++				s.logins.update(seq, "failed", "登录浏览器异常退出，请重新连接")
++			}
++		}()
++		ticker := time.NewTicker(750 * time.Millisecond)
++		defer ticker.Stop()
++		failures := 0
++		candidate := ""
++		for {
++			observed, err := loginAction.ObserveLogin(ctxTimeout)
++			if ctxTimeout.Err() != nil {
++				s.logins.update(seq, "expired", "本次扫码已超时，请重新获取二维码")
+ 				return
+ 			}
+-			logrus.Infof("扫码登录成功，cookies 已保存，会话 #%d", seq)
+-			return
+-		}
+-
+-		// 没等到扫码：要么超时，要么被新取的二维码取代
+-		logrus.Infof("登录会话 #%d 结束，未检测到扫码（超时或已被新的二维码取代）", seq)
++			if err != nil {
++				candidate = ""
++				failures++
++				if failures >= 5 {
++					s.logins.update(seq, "failed", "无法读取登录页面，请保持专用浏览器打开后重新连接")
++					return
++				}
++				s.logins.update(seq, "verifying", "正在等待官方页面加载")
++			} else {
++				failures = 0
++				switch observed.State {
++				case "authenticated":
++					if observed.UserID != "" && candidate == observed.UserID {
++						saveCtx, stop := context.WithTimeout(ctxTimeout, 5*time.Second)
++						ok := s.logins.commit(seq, LoginStatusResponse{Username: observed.Nickname, UserID: observed.UserID}, func() error { return saveCookiesContext(saveCtx, page) })
++						stop()
++						if ok {
++							logrus.Infof("扫码账号已核实，登录信息已保存，会话 #%d", seq)
++						}
++						return
++					}
++					candidate = observed.UserID
++					s.logins.update(seq, "verifying", "正在核实账号并保存登录状态")
++				case "verification_required":
++					candidate = ""
++					s.logins.update(seq, observed.State, "请在已打开的专用小红书浏览器中完成官方验证，完成后会自动继续")
++				case "expired":
++					s.logins.update(seq, observed.State, "官方二维码已失效，请重新获取")
++					return
++				default:
++					candidate = ""
++					s.logins.update(seq, observed.State, "")
++				}
++			}
++			select {
++			case <-ctxTimeout.Done():
++				s.logins.update(seq, "expired", "本次扫码已超时，请重新获取二维码")
++				return
++			case <-ticker.C:
++			}
++		}
+ 	}()
+ }
+ 
+ // PublishContent 发布内容
+ func (s *XiaohongshuService) PublishContent(ctx context.Context, req *PublishRequest) (*PublishResponse, error) {
++	s.prepareMu.Lock()
++	defer s.prepareMu.Unlock()
++	if req.EditorID == "" {
++		return nil, fmt.Errorf("缺少预发布编辑器标识")
++	}
++	s.stopLogin()
++	if req.ExpectedUserID == "" {
++		return nil, fmt.Errorf("缺少确认账号")
++	}
+ 	// 验证标题长度（小红书限制：最大20个字）
+ 	if xhsutil.CalcTitleLength(req.Title) > 20 {
+ 		return nil, fmt.Errorf("标题长度超过限制")
+@@ -239,26 +332,29 @@
+ 	}
+ 
+ 	content := xiaohongshu.PublishImageContent{
+-		Title:        req.Title,
+-		Content:      req.Content,
+-		Tags:         req.Tags,
+-		ImagePaths:   imagePaths,
+-		ScheduleTime: scheduleTime,
+-		IsOriginal:   req.IsOriginal,
+-		Visibility:   req.Visibility,
+-		Products:     req.Products,
+-	}
+-
+-	if err := s.publishContent(ctx, content); err != nil {
++		ExpectedUserID: req.ExpectedUserID,
++		Title:          req.Title,
++		Content:        req.Content,
++		Tags:           req.Tags,
++		ImagePaths:     imagePaths,
++		ScheduleTime:   scheduleTime,
++		IsOriginal:     req.IsOriginal,
++		Visibility:     req.Visibility,
++		Products:       req.Products,
++	}
++
++	if err := s.publishContent(ctx, req.EditorID, content); err != nil {
+ 		logrus.Errorf("发布内容失败: title=%s %v", content.Title, err)
+ 		return nil, err
+ 	}
+ 
+ 	response := &PublishResponse{
+-		Title:   req.Title,
+-		Content: req.Content,
+-		Images:  len(imagePaths),
+-		Status:  "发布完成",
++		Title:    req.Title,
++		Content:  req.Content,
++		Images:   len(imagePaths),
++		Status:   "等待用户预览并手动发布",
++		Prepared: true,
++		Verified: false,
+ 	}
+ 
+ 	return response, nil
+@@ -271,23 +367,27 @@
+ }
+ 
+ // publishContent 执行内容发布
+-func (s *XiaohongshuService) publishContent(ctx context.Context, content xiaohongshu.PublishImageContent) error {
+-	b := newBrowser()
+-	defer b.Close()
+-
+-	page := b.NewPage()
+-	defer page.Close()
+-
+-	action, err := xiaohongshu.NewPublishImageAction(page)
+-	if err != nil {
+-		return err
+-	}
+-
+-	return action.Publish(ctx, content)
++func (s *XiaohongshuService) publishContent(ctx context.Context, editorID string, content xiaohongshu.PublishImageContent) error {
++	return s.prepareInEditor(ctx, editorID, content.ExpectedUserID, func(page *rod.Page) error {
++		action, err := xiaohongshu.NewPublishImageAction(page)
++		if err != nil {
++			return err
++		}
++		return action.Publish(ctx, content)
++	})
+ }
+ 
+ // PublishVideo 发布视频（本地文件）
+ func (s *XiaohongshuService) PublishVideo(ctx context.Context, req *PublishVideoRequest) (*PublishVideoResponse, error) {
++	s.prepareMu.Lock()
++	defer s.prepareMu.Unlock()
++	if req.EditorID == "" {
++		return nil, fmt.Errorf("缺少预发布编辑器标识")
++	}
++	s.stopLogin()
++	if req.ExpectedUserID == "" {
++		return nil, fmt.Errorf("缺少确认账号")
++	}
+ 	// 标题长度校验（小红书限制：最大20个字）
+ 	if xhsutil.CalcTitleLength(req.Title) > 20 {
+ 		return nil, fmt.Errorf("标题长度超过限制")
+@@ -327,42 +427,40 @@
+ 	}
+ 
+ 	content := xiaohongshu.PublishVideoContent{
+-		Title:        req.Title,
+-		Content:      req.Content,
+-		Tags:         req.Tags,
+-		VideoPath:    req.Video,
+-		ScheduleTime: scheduleTime,
+-		Visibility:   req.Visibility,
+-		Products:     req.Products,
+-	}
+-
+-	if err := s.publishVideo(ctx, content); err != nil {
++		ExpectedUserID: req.ExpectedUserID,
++		Title:          req.Title,
++		Content:        req.Content,
++		Tags:           req.Tags,
++		VideoPath:      req.Video,
++		ScheduleTime:   scheduleTime,
++		Visibility:     req.Visibility,
++		Products:       req.Products,
++	}
++
++	if err := s.publishVideo(ctx, req.EditorID, content); err != nil {
+ 		return nil, err
+ 	}
+ 
+ 	resp := &PublishVideoResponse{
+-		Title:   req.Title,
+-		Content: req.Content,
+-		Video:   req.Video,
+-		Status:  "发布完成",
++		Title:    req.Title,
++		Content:  req.Content,
++		Video:    req.Video,
++		Status:   "等待用户预览并手动发布",
++		Prepared: true,
++		Verified: false,
+ 	}
+ 	return resp, nil
+ }
+ 
+ // publishVideo 执行视频发布
+-func (s *XiaohongshuService) publishVideo(ctx context.Context, content xiaohongshu.PublishVideoContent) error {
+-	b := newBrowser()
+-	defer b.Close()
+-
+-	page := b.NewPage()
+-	defer page.Close()
+-
+-	action, err := xiaohongshu.NewPublishVideoAction(page)
+-	if err != nil {
+-		return err
+-	}
+-
+-	return action.PublishVideo(ctx, content)
++func (s *XiaohongshuService) publishVideo(ctx context.Context, editorID string, content xiaohongshu.PublishVideoContent) error {
++	return s.prepareInEditor(ctx, editorID, content.ExpectedUserID, func(page *rod.Page) error {
++		action, err := xiaohongshu.NewPublishVideoAction(page)
++		if err != nil {
++			return err
++		}
++		return action.PublishVideo(ctx, content)
++	})
+ }
+ 
+ // ListFeeds 获取Feeds列表
+@@ -617,15 +715,17 @@
+ 	return xiaohongshu.NewNotificationAction(page).Reply(ctx, commentID, content)
+ }
+ 
+-func newBrowser() *headless_browser.Browser {
++func newBrowser() *browser.Browser {
+ 	return browser.NewBrowser(configs.IsHeadless(),
+-		browser.WithFingerprintSeed(configs.FingerprintSeed()),
+ 		browser.WithProxy(configs.Proxy()),
+ 	)
+ }
+ 
+ func saveCookies(page *rod.Page) error {
+-	cks, err := page.Browser().GetCookies()
++	return saveCookiesContext(page.GetContext(), page)
++}
++func saveCookiesContext(ctx context.Context, page *rod.Page) error {
++	cks, err := page.Browser().Context(ctx).GetCookies()
+ 	if err != nil {
+ 		return err
+ 	}
+--- /dev/null
++++ b/workbench_guard.go
+@@ -0,0 +1,32 @@
++// Workbench fork: modified for local QR publishing (publisher/README.md).
++package main
++
++import (
++	"context"
++	"fmt"
++	"github.com/go-rod/rod"
++	"github.com/xpzouying/xiaohongshu-mcp/xiaohongshu"
++)
++
++func (s *XiaohongshuService) stopLogin() {
++	s.logins.mu.Lock()
++	defer s.logins.mu.Unlock()
++	s.logins.seq++
++	s.logins.status = LoginStatusResponse{}
++	if s.logins.cancel != nil {
++		s.logins.cancel()
++		s.logins.cancel = nil
++	}
++}
++func verifyPublishingAccount(ctx context.Context, page *rod.Page, expected string) error {
++	login := xiaohongshu.NewLogin(page)
++	ok, err := login.CheckLoginStatus(ctx)
++	if err != nil || !ok {
++		return fmt.Errorf("账号登录失效")
++	}
++	user, err := login.CurrentUser(ctx)
++	if err != nil || user.UserID == "" || user.UserID != expected {
++		return fmt.Errorf("发布账号不匹配")
++	}
++	return nil
++}
+--- /dev/null
++++ b/workbench_monitor.go
+@@ -0,0 +1,136 @@
++// Workbench fork: read-only monitoring of the authenticated account's own notes.
++package main
++
++import (
++	"context"
++	"encoding/json"
++	"errors"
++	"net/url"
++	"regexp"
++	"time"
++
++	"github.com/gin-gonic/gin"
++	"github.com/go-rod/rod"
++	"github.com/xpzouying/xiaohongshu-mcp/xiaohongshu"
++)
++
++var ownNoteID = regexp.MustCompile(`^[a-fA-F0-9]{24}$`)
++
++type ownMetrics struct {
++	Likes     string `json:"likes"`
++	Favorites string `json:"favorites"`
++	Comments  string `json:"comments"`
++	Shares    string `json:"shares"`
++	Views     string `json:"views"`
++}
++type ownNote struct {
++	ID          string     `json:"id"`
++	AccountID   string     `json:"account_id"`
++	Title       string     `json:"title"`
++	Kind        string     `json:"kind"`
++	PublishedAt int64      `json:"published_at_ms"`
++	Metrics     ownMetrics `json:"metrics"`
++	DetailState string     `json:"detail_state"`
++}
++type ownNotesResult struct {
++	AccountID string    `json:"account_id"`
++	Username  string    `json:"username"`
++	Scope     string    `json:"scope"`
++	Notes     []ownNote `json:"notes"`
++}
++
++func ownCard(f xiaohongshu.Feed, account string) (ownNote, bool) {
++	if !ownNoteID.MatchString(f.ID) || f.NoteCard.User.UserID != account || (f.ModelType != "" && f.ModelType != "note") {
++		return ownNote{}, false
++	}
++	m := f.NoteCard.InteractInfo
++	return ownNote{ID: f.ID, AccountID: account, Title: f.NoteCard.DisplayTitle, Kind: f.NoteCard.Type, Metrics: ownMetrics{Likes: m.LikedCount, Favorites: m.CollectedCount, Comments: m.CommentCount, Shares: m.SharedCount}, DetailState: "card_only"}, true
++}
++
++// Read only the note object; comments, cookies and arbitrary page state never leave this function.
++func ownDetail(ctx context.Context, page *rod.Page, id, token, account string) (note xiaohongshu.FeedDetail, err error) {
++	defer func() {
++		if recover() != nil {
++			err = errors.New("详情未能读取")
++		}
++	}()
++	p := page.Context(ctx)
++	target := "https://www.xiaohongshu.com/explore/" + id + "?xsec_source=pc_user&xsec_token=" + url.QueryEscape(token)
++	if err = p.Navigate(target); err != nil {
++		return
++	}
++	err = p.Wait(rod.Eval(`(id) => !!window.__INITIAL_STATE__?.note?.noteDetailMap?.[id]?.note`, id))
++	if err != nil {
++		return
++	}
++	result, e := p.Eval(`(id) => {const n=window.__INITIAL_STATE__.note.noteDetailMap[id].note;return JSON.stringify({noteId:n.noteId,title:n.title,type:n.type,time:n.time,user:{userId:n.user?.userId},interactInfo:n.interactInfo});}`, id)
++	if e != nil {
++		return note, e
++	}
++	if err = json.Unmarshal([]byte(result.Value.String()), &note); err != nil {
++		return
++	}
++	if note.NoteID != id || note.User.UserID != account {
++		return note, errors.New("作品账号不匹配")
++	}
++	return
++}
++
++func (s *AppServer) ownNotesHandler(c *gin.Context) {
++	var req struct {
++		AccountID string `json:"account_id"`
++	}
++	if c.ShouldBindJSON(&req) != nil || req.AccountID == "" {
++		c.AbortWithStatus(400)
++		return
++	}
++	ctx, cancel := context.WithTimeout(c.Request.Context(), 5*time.Minute)
++	defer cancel()
++	b := newBrowser()
++	defer b.Close()
++	page := b.NewPage()
++	defer page.Close()
++	if err := verifyPublishingAccount(ctx, page, req.AccountID); err != nil {
++		respondError(c, 409, "ACCOUNT_MISMATCH", "请重新核对登录账号", nil)
++		return
++	}
++	user, err := xiaohongshu.NewLogin(page).CurrentUser(ctx)
++	if err != nil || user.UserID != req.AccountID {
++		respondError(c, 409, "ACCOUNT_MISMATCH", "无法核对账号", nil)
++		return
++	}
++	profile, err := xiaohongshu.NewUserProfileAction(page).GetMyProfileViaSidebar(ctx, xiaohongshu.TabNotes)
++	if err != nil {
++		respondError(c, 503, "PROFILE_UNAVAILABLE", "未能读取自己的作品列表", nil)
++		return
++	}
++	result := ownNotesResult{AccountID: req.AccountID, Username: user.Nickname, Scope: "profile_loaded_max_20", Notes: []ownNote{}}
++	seen := map[string]bool{}
++	for _, f := range profile.Feeds {
++		n, ok := ownCard(f, req.AccountID)
++		if !ok || seen[n.ID] {
++			continue
++		}
++		seen[n.ID] = true
++		if len(result.Notes) >= 20 {
++			break
++		}
++		detailCtx, stop := context.WithTimeout(ctx, 10*time.Second)
++		detail, e := ownDetail(detailCtx, page, n.ID, f.XsecToken, req.AccountID)
++		stop()
++		if e == nil {
++			n.Title = detail.Title
++			n.Kind = detail.Type
++			n.PublishedAt = detail.Time
++			n.DetailState = "ready"
++			m := detail.InteractInfo
++			n.Metrics = ownMetrics{Likes: m.LikedCount, Favorites: m.CollectedCount, Comments: m.CommentCount, Shares: m.SharedCount}
++		}
++		result.Notes = append(result.Notes, n)
++	}
++	if len(profile.Feeds) > 0 && len(result.Notes) == 0 {
++		respondError(c, 503, "PROFILE_UNAVAILABLE", "无法确认作品归属，保留旧数据", nil)
++		return
++	}
++	respondSuccess(c, result, "已读取当前可获取的自己的帖子")
++}
+--- /dev/null
++++ b/workbench_monitor_test.go
+@@ -0,0 +1,22 @@
++// Workbench fork: ownership and optional metric regression tests.
++package main
++
++import (
++	"github.com/xpzouying/xiaohongshu-mcp/xiaohongshu"
++	"testing"
++)
++
++func TestWorkbenchOwnCard(t *testing.T) {
++	f := xiaohongshu.Feed{ID: "0123456789abcdef01234567", ModelType: "note", NoteCard: xiaohongshu.NoteCard{User: xiaohongshu.User{UserID: "owner"}, InteractInfo: xiaohongshu.InteractInfo{LikedCount: "0"}}}
++	n, ok := ownCard(f, "owner")
++	if !ok || n.Metrics.Likes != "0" || n.Metrics.Comments != "" {
++		t.Fatal("zero and unknown conflated")
++	}
++	if _, ok = ownCard(f, "other"); ok {
++		t.Fatal("foreign note accepted")
++	}
++	f.ID = "../escape"
++	if _, ok = ownCard(f, "owner"); ok {
++		t.Fatal("invalid ID accepted")
++	}
++}
+--- /dev/null
++++ b/workbench_routes_test.go
+@@ -0,0 +1,23 @@
++// Workbench fork: modified for local QR publishing (publisher/README.md).
++package main
++
++import (
++	"net/http/httptest"
++	"testing"
++)
++
++func TestWorkbenchEndpointIsolation(t *testing.T) {
++	r := setupRoutes(&AppServer{authToken: "test-token"})
++	for _, tc := range []struct {
++		path, origin string
++		code         int
++	}{{"/api/v1/login/status", "", 401}, {"/api/v1/login/status", "https://example.com", 403}, {"/mcp", "", 404}, {"/health", "", 200}} {
++		q := httptest.NewRequest("GET", tc.path, nil)
++		q.Header.Set("Origin", tc.origin)
++		w := httptest.NewRecorder()
++		r.ServeHTTP(w, q)
++		if w.Code != tc.code {
++			t.Fatal(tc.path, w.Code)
++		}
++	}
++}
+--- a/xiaohongshu/login.go
++++ b/xiaohongshu/login.go
+@@ -1,129 +1,146 @@
++// Workbench fork: modified for local QR publishing (publisher/README.md).
+ package xiaohongshu
+ 
+ import (
+ 	"context"
+-	"encoding/json"
++	_ "embed"
++	"errors"
++	"github.com/go-rod/rod"
+ 	"time"
+-
+-	"github.com/go-rod/rod"
+-	"github.com/pkg/errors"
+ )
+ 
+-type LoginAction struct {
+-	page *rod.Page
+-}
++//go:embed login_probe.js
++var loginProbe string
+ 
+-func NewLogin(page *rod.Page) *LoginAction {
+-	return &LoginAction{page: page}
+-}
++type LoginAction struct{ page *rod.Page }
+ 
+-func (a *LoginAction) CheckLoginStatus(ctx context.Context) (bool, error) {
+-	// 加超时保护：只是查登录态的快速检查，不应无限挂（登录扫码的等待在 Login/WaitForLogin 里）
+-	pp := a.page.Context(ctx).Timeout(30 * time.Second)
+-	pp.MustNavigate("https://www.xiaohongshu.com/explore").MustWaitLoad()
++func NewLogin(page *rod.Page) *LoginAction { return &LoginAction{page: page} }
+ 
+-	time.Sleep(1 * time.Second)
+-
+-	exists, _, err := pp.Has(`.main-container .user .link-wrapper .channel`)
+-	if err != nil {
+-		return false, errors.Wrap(err, "check login status failed")
+-	}
+-
+-	if !exists {
+-		return false, errors.Wrap(err, "login status element not found")
+-	}
+-
+-	return true, nil
+-}
+-
+-// CurrentUser 当前登录用户的基础信息。
+ type CurrentUser struct {
+ 	Nickname string `json:"nickname"`
+ 	UserID   string `json:"userId"`
+ }
+-
+-// CurrentUser 从当前页面的 __INITIAL_STATE__ 读取登录用户信息。
+-// 需在 CheckLoginStatus 之后调用：复用已加载的 explore 页，不做额外导航。
+-func (a *LoginAction) CurrentUser(ctx context.Context) (*CurrentUser, error) {
+-	pp := a.page.Context(ctx).Timeout(10 * time.Second)
+-
+-	res, err := pp.Eval(`() => {
+-		const u = window.__INITIAL_STATE__ && window.__INITIAL_STATE__.user;
+-		const info = u && u.userInfo && u.userInfo.value !== undefined ? u.userInfo.value : (u && u.userInfo);
+-		if (!info || info.guest) return "";
+-		return JSON.stringify({nickname: info.nickname, userId: info.userId || info.user_id});
+-	}`)
+-	if err != nil {
+-		return nil, errors.Wrap(err, "read current user state failed")
+-	}
+-
+-	raw := res.Value.String()
+-	if raw == "" {
+-		return nil, errors.New("current user not found in page state")
+-	}
+-
+-	var user CurrentUser
+-	if err := json.Unmarshal([]byte(raw), &user); err != nil {
+-		return nil, errors.Wrap(err, "unmarshal current user failed")
+-	}
+-
+-	return &user, nil
++type LoginObservation struct {
++	State    string `json:"state"`
++	Nickname string `json:"nickname"`
++	UserID   string `json:"userId"`
+ }
+ 
+-func (a *LoginAction) Login(ctx context.Context) error {
+-	pp := a.page.Context(ctx)
++// ObserveLogin never navigates or waits for a CSS element. QR polling must keep
++// the scanned page alive, including any official verification flow.
++func (a *LoginAction) ObserveLogin(ctx context.Context) (LoginObservation, error) {
++	probeCtx, cancel := context.WithTimeout(ctx, 3*time.Second)
++	defer cancel()
++	res, err := a.page.Context(probeCtx).Eval(loginProbe)
++	if err != nil {
++		return LoginObservation{}, errors.New("无法读取登录页面，请保持专用浏览器打开")
++	}
++	var state LoginObservation
++	if err := res.Value.Unmarshal(&state); err != nil {
++		return state, errors.New("无法识别登录页面状态")
++	}
++	return state, nil
++}
+ 
+-	// 导航到小红书首页，这会触发二维码弹窗
+-	pp.MustNavigate("https://www.xiaohongshu.com/explore").MustWaitLoad()
+-
+-	time.Sleep(2 * time.Second)
+-
+-	if exists, _, _ := pp.Has(".main-container .user .link-wrapper .channel"); exists {
+-		return nil
++func (a *LoginAction) navigate(ctx context.Context) error {
++	p := a.page.Context(ctx)
++	if err := p.Navigate("https://www.xiaohongshu.com/explore"); err != nil {
++		return errors.New("无法打开小红书登录页面")
+ 	}
+-
+-	pp.MustElement(".main-container .user .link-wrapper .channel")
+-
++	if err := p.WaitLoad(); err != nil {
++		return errors.New("小红书登录页面加载未完成")
++	}
+ 	return nil
+ }
+-
+-func (a *LoginAction) FetchQrcodeImage(ctx context.Context) (string, bool, error) {
+-	pp := a.page.Context(ctx)
+-
+-	// 导航到小红书首页，这会触发二维码弹窗
+-	pp.MustNavigate("https://www.xiaohongshu.com/explore").MustWaitLoad()
+-
+-	time.Sleep(2 * time.Second)
+-
+-	if exists, _, _ := pp.Has(".main-container .user .link-wrapper .channel"); exists {
+-		return "", true, nil
++func (a *LoginAction) CheckLoginStatus(ctx context.Context) (bool, error) {
++	ctx, cancel := context.WithTimeout(ctx, 30*time.Second)
++	defer cancel()
++	if err := a.navigate(ctx); err != nil {
++		return false, err
+ 	}
+-
+-	src, err := pp.MustElement(".login-container .qrcode-img").Attribute("src")
+-	if err != nil {
+-		return "", false, errors.Wrap(err, "get qrcode src failed")
+-	}
+-	if src == nil || len(*src) == 0 {
+-		return "", false, errors.New("qrcode src is empty")
+-	}
+-
+-	return *src, false, nil
+-}
+-
+-func (a *LoginAction) WaitForLogin(ctx context.Context) bool {
+-	pp := a.page.Context(ctx)
++	// Allow hydration instead of assuming state is ready one second after load.
+ 	ticker := time.NewTicker(500 * time.Millisecond)
+ 	defer ticker.Stop()
+-
+ 	for {
++		state, err := a.ObserveLogin(ctx)
++		if err == nil && state.State == "authenticated" {
++			return true, nil
++		}
++		if err == nil && (state.State == "verification_required" || state.State == "expired") {
++			return false, nil
++		}
++		// Logged-out pages with a real QR do not need the full hydration timeout.
++		if els, e := a.page.Context(ctx).Elements(".login-container .qrcode-img"); e == nil && len(els) > 0 {
++			if visible, e := els[0].Visible(); e == nil && visible {
++				return false, nil
++			}
++		}
++		select {
++		case <-ctx.Done():
++			return false, errors.New("登录状态核验超时，请在专用浏览器检查页面")
++		case <-ticker.C:
++		}
++	}
++}
++func (a *LoginAction) CurrentUser(ctx context.Context) (*CurrentUser, error) {
++	state, err := a.ObserveLogin(ctx)
++	if err != nil {
++		return nil, err
++	}
++	if state.State != "authenticated" || state.UserID == "" {
++		return nil, errors.New("尚未核实当前登录账号")
++	}
++	return &CurrentUser{Nickname: state.Nickname, UserID: state.UserID}, nil
++}
++func (a *LoginAction) Login(ctx context.Context) error {
++	if err := a.navigate(ctx); err != nil {
++		return err
++	}
++	if !a.WaitForLogin(ctx) {
++		return errors.New("登录未完成或已超时")
++	}
++	return nil
++}
++func (a *LoginAction) FetchQrcodeImage(ctx context.Context) (string, bool, error) {
++	ctx, cancel := context.WithTimeout(ctx, 45*time.Second)
++	defer cancel()
++	if err := a.navigate(ctx); err != nil {
++		return "", false, err
++	}
++	ticker := time.NewTicker(500 * time.Millisecond)
++	defer ticker.Stop()
++	for {
++		state, err := a.ObserveLogin(ctx)
++		if err == nil && state.State == "authenticated" {
++			return "", true, nil
++		}
++		els, err := a.page.Context(ctx).Elements(".login-container .qrcode-img")
++		if err == nil && len(els) > 0 {
++			visible, _ := els[0].Visible()
++			src, e := els[0].Attribute("src")
++			if visible && e == nil && src != nil && *src != "" {
++				return *src, false, nil
++			}
++		}
++		select {
++		case <-ctx.Done():
++			return "", false, errors.New("未读取到二维码，请检查小红书页面或网络后重试")
++		case <-ticker.C:
++		}
++	}
++}
++func (a *LoginAction) WaitForLogin(ctx context.Context) bool {
++	ticker := time.NewTicker(750 * time.Millisecond)
++	defer ticker.Stop()
++	for {
++		state, err := a.ObserveLogin(ctx)
++		if err == nil && state.State == "authenticated" {
++			return true
++		}
+ 		select {
+ 		case <-ctx.Done():
+ 			return false
+ 		case <-ticker.C:
+-			el, err := pp.Element(".main-container .user .link-wrapper .channel")
+-			if err == nil && el != nil {
+-				return true
+-			}
+ 		}
+ 	}
+ }
+--- /dev/null
++++ b/xiaohongshu/login_probe.js
+@@ -0,0 +1,28 @@
++() => {
++  // Read only the authenticated-user branch, never a feed author's profile.
++  const unwrap = v => v && typeof v === "object" && "value" in v ? v.value : v;
++  const visible = e => !!e && e.getClientRects().length > 0 && getComputedStyle(e).visibility !== "hidden" && getComputedStyle(e).display !== "none";
++  const result = state => ({state, nickname: "", userId: ""});
++  if (!["www.xiaohongshu.com", "xiaohongshu.com"].includes(location.hostname)) return result("verification_required");
++  const dialogs = [...document.querySelectorAll('.login-container, [role="dialog"], .captcha-container')].filter(visible);
++  const text = dialogs.map(e => e.innerText || "").join("\n");
++  if (dialogs.some(e => /安全验证|拖动滑块|完成验证|短信验证|身份验证/.test(e.innerText || "")) ||
++      [...document.querySelectorAll('iframe[src*="captcha"]')].some(visible)) return result("verification_required");
++  if (/二维码.*(?:失效|过期)|(?:失效|过期).*二维码/.test(text)) return result("expired");
++  const user = unwrap(window.__INITIAL_STATE__?.user);
++  const info = unwrap(user?.userInfo);
++  const id = String(info?.userId || info?.user_id || "");
++  const valid = v => /^[a-f0-9]{24}$/i.test(v);
++  const guest = info?.guest === true || info?.guest === 1 || info?.guest === "true";
++  const loginVisible = [...document.querySelectorAll('.login-container')].some(visible);
++  if (!loginVisible && !guest && valid(id)) return {state: "authenticated", userId: id, nickname: typeof info.nickname === "string" ? info.nickname.slice(0, 200) : ""};
++  // A sidebar's own-account link is an independent identity signal when page state is absent.
++  const own = [...document.querySelectorAll('nav a[href*="/user/profile/"], [role="navigation"] a[href*="/user/profile/"], .side-bar a[href*="/user/profile/"], .sidebar a[href*="/user/profile/"], .main-container .user a[href*="/user/profile/"]')]
++    .filter(e => visible(e) && /^(我|我的|个人主页)$/.test((e.innerText || "").trim()))
++    .map(e => { try { const u = new URL(e.href, location.href); return u.origin === location.origin ? u.pathname.match(/^\/user\/profile\/([a-f0-9]{24})\/?$/i)?.[1] : undefined; } catch { return undefined; } })
++    .filter(Boolean);
++  const ids = [...new Set(own)];
++  if (!loginVisible && !guest && ids.length === 1 && (!valid(id) || id === ids[0])) return {state: "authenticated", userId: ids[0], nickname: ""};
++  if (/扫码成功|扫描成功|手机.*确认|确认.*登录/.test(text)) return result("verifying");
++  return result("waiting_scan");
++}
+--- a/xiaohongshu/publish.go
++++ b/xiaohongshu/publish.go
+@@ -1,3 +1,4 @@
++// Workbench fork: modified for local QR publishing (publisher/README.md).
+ package xiaohongshu
+ 
+ import (
+@@ -19,14 +20,15 @@
+ 
+ // PublishImageContent 发布图文内容
+ type PublishImageContent struct {
+-	Title        string
+-	Content      string
+-	Tags         []string
+-	ImagePaths   []string
+-	ScheduleTime *time.Time // 定时发布时间，nil 表示立即发布
+-	IsOriginal   bool       // 是否声明原创
+-	Visibility   string     // 可见范围: "公开可见"(默认), "仅自己可见", "仅互关好友可见"
+-	Products     []string   // 商品关键词列表，用于绑定带货商品
++	ExpectedUserID string
++	Title          string
++	Content        string
++	Tags           []string
++	ImagePaths     []string
++	ScheduleTime   *time.Time // 定时发布时间，nil 表示立即发布
++	IsOriginal     bool       // 是否声明原创
++	Visibility     string     // 可见范围: "公开可见"(默认), "仅自己可见", "仅互关好友可见"
++	Products       []string   // 商品关键词列表，用于绑定带货商品
+ }
+ 
+ type PublishAction struct {
+@@ -95,7 +97,7 @@
+ 	logrus.Infof("发布内容: title=%s, images=%v, tags=%v, schedule=%v, original=%v, visibility=%s, products=%v", content.Title, len(content.ImagePaths), tags, content.ScheduleTime, content.IsOriginal, content.Visibility, content.Products)
+ 
+ 	if err := submitPublish(ctx, page, content.Title, content.Content, tags, content.ScheduleTime, content.IsOriginal, content.Visibility, content.Products); err != nil {
+-		return errors.Wrap(err, "小红书发布失败")
++		return errors.Wrap(err, "小红书预发布准备失败")
+ 	}
+ 
+ 	return nil
+@@ -407,50 +409,13 @@
+ 		return errors.Wrap(err, "绑定商品失败")
+ 	}
+ 
+-	if err := clickPublishButton(page); err != nil {
+-		return err
+-	}
+-
+-	// 校验发布真的成功：成功后创作平台会跳转离开发布页；未跳转则判定失败，
+-	// 消除"点了发布按钮就算成功"的假阳性。
+-	return waitPublishSuccess(page, 15*time.Second)
+-}
+-
+-// waitPublishSuccess 轮询等待发布成功的信号：小红书发布成功后会跳转离开发布表单页
+-// （URL 不再含 /publish/publish）。超时仍未跳转 → 判定发布失败。
+-func waitPublishSuccess(page *rod.Page, timeout time.Duration) error {
+-	deadline := time.Now().Add(timeout)
+-	for {
+-		if info, err := page.Info(); err == nil && !strings.Contains(info.URL, "/publish/publish") {
+-			slog.Info("发布成功，已跳转离开发布页", "url", info.URL)
+-			return nil
+-		}
+-		if time.Now().After(deadline) {
+-			return errors.New("发布未确认成功：点击发布后未跳转离开发布页（可能校验未过或被拦截）")
+-		}
+-		time.Sleep(500 * time.Millisecond)
+-	}
++	// Preparation stops here. The user reviews and clicks Publish in the official editor.
++	return nil
+ }
+ 
+ type publishButton struct {
+ 	elem     *rod.Element
+ 	isWidget bool
+-}
+-
+-func clickPublishButton(page *rod.Page) error {
+-	btn, err := waitForPublishButtonClickable(page, 15*time.Second)
+-	if err != nil {
+-		return err
+-	}
+-
+-	if btn.isWidget {
+-		return clickPublishWidget(page, btn.elem)
+-	}
+-
+-	if err := humanize.Click(btn.elem); err != nil {
+-		return errors.Wrap(err, "点击发布按钮失败")
+-	}
+-	return nil
+ }
+ 
+ // waitForPublishButtonClickable 等待新版 xhs-publish-btn 或旧版 button.bg-red 可点击。
+@@ -545,48 +510,6 @@
+ 	}
+ 
+ 	return nil, "", nil
+-}
+-
+-func clickPublishWidget(page *rod.Page, widget *rod.Element) error {
+-	if err := widget.ScrollIntoView(); err != nil {
+-		return errors.Wrap(err, "滚动新版发布按钮到可视区域失败")
+-	}
+-	time.Sleep(200 * time.Millisecond)
+-
+-	shape, err := widget.Shape()
+-	if err != nil {
+-		return errors.Wrap(err, "获取新版发布按钮位置失败")
+-	}
+-	if len(shape.Quads) == 0 {
+-		return errors.New("获取新版发布按钮位置失败: 无可点击区域")
+-	}
+-
+-	quad := shape.Quads[0]
+-	minX, maxX := quad[0], quad[0]
+-	minY, maxY := quad[1], quad[1]
+-	for i := 0; i < quad.Len(); i++ {
+-		x := quad[i*2]
+-		y := quad[i*2+1]
+-		if x < minX {
+-			minX = x
+-		}
+-		if x > maxX {
+-			maxX = x
+-		}
+-		if y < minY {
+-			minY = y
+-		}
+-		if y > maxY {
+-			maxY = y
+-		}
+-	}
+-
+-	x := minX + (maxX-minX)*0.65
+-	y := minY + (maxY-minY)/2
+-	if err := humanize.ClickAt(page, proto.Point{X: x, Y: y}); err != nil {
+-		return errors.Wrap(err, "点击新版发布按钮失败")
+-	}
+-	return nil
+ }
+ 
+ // closeFeatureGuide 页面有功能引导卡时点「我知道了」关闭
+--- a/xiaohongshu/publish_video.go
++++ b/xiaohongshu/publish_video.go
+@@ -1,3 +1,4 @@
++// Workbench fork: modified for local QR publishing (publisher/README.md).
+ package xiaohongshu
+ 
+ import (
+@@ -14,13 +15,14 @@
+ 
+ // PublishVideoContent 发布视频内容
+ type PublishVideoContent struct {
+-	Title        string
+-	Content      string
+-	Tags         []string
+-	VideoPath    string
+-	ScheduleTime *time.Time // 定时发布时间，nil 表示立即发布
+-	Visibility   string     // 可见范围: "公开可见"(默认), "仅自己可见", "仅互关好友可见"
+-	Products     []string   // 商品关键词列表，用于绑定带货商品
++	ExpectedUserID string
++	Title          string
++	Content        string
++	Tags           []string
++	VideoPath      string
++	ScheduleTime   *time.Time // 定时发布时间，nil 表示立即发布
++	Visibility     string     // 可见范围: "公开可见"(默认), "仅自己可见", "仅互关好友可见"
++	Products       []string   // 商品关键词列表，用于绑定带货商品
+ }
+ 
+ // NewPublishVideoAction 进入发布页并切换到"上传视频"
+@@ -55,7 +57,7 @@
+ 	return &PublishAction{page: pp}, nil
+ }
+ 
+-// PublishVideo 上传视频并提交
++// PublishVideo 上传视频并准备编辑页，不提交
+ func (p *PublishAction) PublishVideo(ctx context.Context, content PublishVideoContent) error {
+ 	if content.VideoPath == "" {
+ 		return errors.New("视频不能为空")
+@@ -69,7 +71,7 @@
+ 	}
+ 
+ 	if err := submitPublishVideo(ctx, page, content.Title, content.Content, content.Tags, content.ScheduleTime, content.Visibility, content.Products); err != nil {
+-		return errors.Wrap(err, "小红书发布失败")
++		return errors.Wrap(err, "小红书预发布准备失败")
+ 	}
+ 	return nil
+ }
+@@ -104,7 +106,7 @@
+ 	return nil
+ }
+ 
+-// submitPublishVideo 填写标题、正文、标签并点击发布（等待按钮可点击后再提交）
++// submitPublishVideo 填写标题、正文、标签及设置，保留页面等待本人发布
+ func submitPublishVideo(ctx context.Context, page *rod.Page, title, content string, tags []string, scheduleTime *time.Time, visibility string, products []string) error {
+ 	// 标题
+ 	titleElem, err := page.Element("div.d-input input")
+@@ -151,10 +153,6 @@
+ 		return errors.Wrap(err, "绑定商品失败")
+ 	}
+ 
+-	if err := clickPublishButton(page); err != nil {
+-		return err
+-	}
+-
+-	// 校验发布真的成功（成功跳转离开发布页），未跳转判失败——消除假成功
+-	return waitPublishSuccess(page, 15*time.Second)
++	// Preparation stops here. The user reviews and clicks Publish in the official editor.
++	return nil
+ }

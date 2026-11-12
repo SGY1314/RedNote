@@ -1,0 +1,255 @@
+/* Rose-only finishes for native scrollbars, custom illustrations and portals. */
+html[data-theme="rose"] {
+  scrollbar-color: #c8a0b5 transparent;
+}
+html[data-theme="rose"] :is(.rednote-shell, .ant-modal, .ant-drawer) * {
+  scrollbar-color: #c8a0b5 transparent;
+}
+html[data-theme="rose"] .rednote-shell .image-result-timeline:hover {
+  scrollbar-color: #b27996 transparent;
+}
+html[data-theme="rose"] .project-scroll-thumb {
+  background: #cfabba;
+}
+html[data-theme="rose"]
+  .project-scroll-thumb:is(:hover, :focus-visible, .is-dragging) {
+  background: #b27996;
+  outline-color: #d9b6c8;
+}
+html[data-theme="rose"]
+  :is(
+    .image-result-timeline,
+    .video-result-carousel,
+    .publication-editor-media
+  ):focus-visible {
+  outline-color: var(--forest-accent);
+}
+html[data-theme="rose"]
+  .ant-modal-confirm-confirm
+  .ant-modal-confirm-body
+  > .anticon {
+  color: var(--forest-accent);
+}
+html[data-theme="rose"]
+  .ant-modal-confirm-confirm
+  .ant-modal-confirm-body
+  > .confirm-butterfly {
+  color: #b27996;
+  font-size: 28px;
+  line-height: 1;
+}
+html[data-theme="rose"]
+  .rednote-shell
+  :is(.brand, .brand-copy, .topbar, .workspace-heading, .topbar-actions) {
+  color: var(--forest-muted);
+}
+html[data-theme="rose"]
+  :is(
+    .collection-count-label,
+    .collection-card-avatar,
+    .collection-card-delete,
+    .note-original-topics,
+    .publication-times,
+    .media-result-meta
+  ) {
+  color: var(--forest-muted);
+}
+html[data-theme="rose"] .collection-card-avatar {
+  background: var(--forest-sage);
+}
+html[data-theme="rose"]
+  .rednote-shell
+  .collection-card-body
+  .note-original-topics {
+  color: var(--forest-muted);
+}
+html[data-theme="rose"] .collection-card-page video {
+  background: #30242c;
+}
+html[data-theme="rose"]
+  .rednote-shell
+  .collection-card-actions
+  > button.collection-card-delete,
+html[data-theme="rose"] .project-rail-item-actions .project-rail-delete {
+  color: #8d687a;
+}
+html[data-theme="rose"]
+  .rednote-shell
+  .collection-card-actions
+  > button.collection-card-delete:hover,
+html[data-theme="rose"] .project-rail-item-actions .project-rail-delete:hover {
+  color: var(--forest-accent);
+  background: var(--forest-sage);
+}
+html[data-theme="rose"] .rednote-shell .publication-stat,
+html[data-theme="rose"] .rednote-shell .publication-stat > strong,
+html[data-theme="rose"] .rednote-shell .publication-note > div > strong,
+html[data-theme="rose"] .rednote-shell .publication-card-content strong {
+  color: var(--forest-ink);
+}
+html[data-theme="rose"] .rednote-shell .publication-stat > span,
+html[data-theme="rose"] .rednote-shell .publication-note small,
+html[data-theme="rose"] .rednote-shell .publication-card-content small,
+html[data-theme="rose"] .rednote-shell .publication-thumbnail {
+  color: var(--forest-muted);
+}
+html[data-theme="rose"] .ant-empty-description {
+  color: #8f7485;
+}
+html[data-theme="rose"] .ant-switch-handle::before {
+  box-shadow: 0 2px 4px #70485b26;
+}
+
+html[data-theme="rose"] .creation-workflow .title-wheel-panel {
+  background: linear-gradient(120deg, #f8eaf1, #fffaf8 70%);
+}
+html[data-theme="rose"] .title-wheel-ring {
+  border-color: #e3c1d2;
+  background: conic-gradient(
+    from -36deg,
+    #f0dce6,
+    #dfb9cd 20%,
+    #f8edf2 40%,
+    #e4c2d3 60%,
+    #f6e5ee 80%,
+    #f0dce6
+  );
+  box-shadow:
+    inset 0 0 0 24px #ffffff70,
+    0 8px 28px #70485b1a;
+}
+html[data-theme="rose"] .title-wheel-ring::after {
+  border-color: #c394ad80;
+}
+html[data-theme="rose"] .title-wheel-hub {
+  background: linear-gradient(145deg, #fffaf8, #f7eaf0);
+  box-shadow: 0 8px 20px #70485b26;
+}
+html[data-theme="rose"] .title-wheel-hub > i {
+  background: #dbc0cf;
+}
+html[data-theme="rose"]
+  :is(
+    .title-wheel-hub > small,
+    .title-wheel-card-meta,
+    .title-wheel-card-meta > small
+  ) {
+  color: var(--forest-muted);
+}
+html[data-theme="rose"] .title-wheel-card {
+  background: var(--forest-paper);
+  border-color: var(--forest-line);
+  box-shadow: 0 4px 10px #70485b0a;
+}
+html[data-theme="rose"] .title-wheel-card.is-active {
+  border-color: #bc8ba4;
+  box-shadow: 0 8px 20px #70485b14;
+}
+html[data-theme="rose"] .title-wheel-card.is-selected {
+  background: var(--forest-sage);
+  border-color: var(--forest-accent);
+}
+html[data-theme="rose"] .title-wheel-card .ant-input:focus {
+  box-shadow: 0 1px 0 #bc8ba4;
+}
+html[data-theme="rose"] .title-wheel-card-meta > .workflow-over-limit {
+  color: #ac515d;
+}
+
+html[data-theme="rose"]
+  .image-timeline-entry
+  > :is(.media-output-card, .image-upload-card) {
+  background: var(--forest-paper);
+  border-color: var(--forest-line);
+  box-shadow: 0 3px 12px #70485b08;
+}
+html[data-theme="rose"]
+  .image-timeline-entry
+  > :is(.media-output-card, .image-upload-card).is-selected {
+  border-color: var(--forest-accent);
+  box-shadow: 0 0 0 1px #985a7226;
+}
+html[data-theme="rose"] .image-timeline-entry .media-output-preview {
+  background: #f7eaf0;
+}
+html[data-theme="rose"] .video-result-card {
+  background: var(--forest-paper);
+  border-color: var(--forest-line);
+  box-shadow: 0 8px 28px #70485b14;
+}
+html[data-theme="rose"] .video-result-card.is-selected {
+  border-color: var(--forest-accent);
+}
+html[data-theme="rose"] .video-result-preview {
+  background: #30242c;
+}
+html[data-theme="rose"] .video-result-caption {
+  color: var(--forest-ink);
+}
+html[data-theme="rose"]
+  :is(.video-result-caption small, .video-result-position) {
+  color: var(--forest-muted);
+}
+html[data-theme="rose"] .video-result-card .media-output-actions {
+  border-color: var(--forest-line);
+}
+html[data-theme="rose"] .video-result-pagination button {
+  background: #dfbfd0;
+}
+html[data-theme="rose"] .video-result-pagination button[aria-current="true"] {
+  background: var(--forest-accent);
+}
+html[data-theme="rose"] .video-result-pagination button:focus-visible {
+  outline-color: var(--forest-accent);
+}
+html[data-theme="rose"]
+  :is(.video-result-arrow.ant-btn, .source-page-button.ant-btn) {
+  box-shadow: 0 2px 8px #70485b14;
+}
+html[data-theme="rose"]
+  .media-source-carousel
+  .source-page-button.ant-btn:disabled {
+  color: #baa2af;
+}
+html[data-theme="rose"] .source-book-front,
+html[data-theme="rose"] .source-book-back {
+  box-shadow: 7px 0 18px #70485b26;
+}
+html[data-theme="rose"] .source-book-front::after {
+  background: linear-gradient(
+    90deg,
+    #70485b26,
+    transparent 35%,
+    #fff3 85%,
+    #70485b26
+  );
+}
+html[data-theme="rose"] .source-book-back {
+  background: linear-gradient(90deg, #f0dce6, #fffaf8 28%, #f8edf2);
+}
+
+html[data-theme="rose"] .publication-confirmation .publication-content-preview {
+  background: var(--forest-paper);
+}
+html[data-theme="rose"] .publication-confirm-retry {
+  color: var(--forest-accent);
+}
+html[data-theme="rose"] .publication-editor-media:not(.is-video) {
+  background: #f3e1e8;
+}
+html[data-theme="rose"] .publication-editor-thumbnails button {
+  background: var(--forest-sage);
+  box-shadow: 0 3px 12px #70485b30;
+}
+html[data-theme="rose"]
+  .publication-editor-thumbnails
+  button[aria-current="true"] {
+  border-color: var(--forest-accent);
+  box-shadow:
+    0 0 0 2px #fffaf8,
+    0 4px 12px #70485b30;
+}
+html[data-theme="rose"] .publication-editor-arrow.ant-btn {
+  color: var(--forest-accent);
+  box-shadow: 0 2px 8px #70485b14;
+}

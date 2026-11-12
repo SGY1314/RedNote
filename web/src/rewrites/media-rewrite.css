@@ -1,0 +1,201 @@
+.media-source-panel {
+  display: grid;
+  min-width: 0;
+  align-self: start;
+}
+.media-rewrite-video .media-source-panel {
+  align-self: stretch;
+}
+.media-rewrite-video .media-source-carousel.title-original-media {
+  align-self: stretch;
+  height: 100%;
+  min-height: 220px;
+  max-height: none;
+  aspect-ratio: auto;
+}
+.video-script-editor {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+}
+.video-script-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px 16px;
+  color: var(--forest-muted);
+  font-size: 13px;
+}
+.video-script-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+.video-script-actions .ant-select {
+  width: 180px;
+  min-width: 0;
+}
+.video-script-actions .ant-btn {
+  height: 40px;
+}
+.media-property-grid {
+  display: grid;
+  grid-template-columns: minmax(160px, 2fr) repeat(3, minmax(90px, 1fr));
+  gap: 16px;
+  align-items: end;
+  min-width: 0;
+}
+.media-property-grid .workflow-field,
+.media-rewrite-panel > .workflow-field {
+  margin: 0;
+  min-width: 0;
+}
+.media-property-grid .ant-select,
+.media-property-grid .ant-input-number {
+  width: 100%;
+  min-width: 0;
+}
+.media-rewrite-video .media-property-grid {
+  grid-template-columns: minmax(150px, 2fr) repeat(4, minmax(64px, 1fr)) 52px;
+  gap: 12px;
+}
+.media-rewrite-video .media-model-field {
+  grid-column: auto;
+}
+.media-audio-field {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  color: var(--forest-muted);
+  font-size: 13px;
+}
+.media-audio-control {
+  display: flex;
+  align-items: center;
+  height: 40px;
+}
+.media-generate-row {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.media-generate-row > span {
+  font-size: 12px;
+  color: var(--forest-muted);
+  margin-right: auto;
+}
+.media-generate-row > .ant-btn {
+  min-width: 144px;
+  height: 42px;
+  border-radius: 12px;
+}
+.media-generated-section {
+  display: grid;
+  gap: 20px;
+  min-width: 0;
+}
+.media-output-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+  gap: 18px;
+  min-width: 0;
+}
+.media-output-card {
+  border: 1px solid var(--forest-line);
+  border-radius: 16px;
+  overflow: hidden;
+  background: var(--forest-paper);
+  min-width: 0;
+  max-width: 360px;
+}
+.media-output-preview {
+  aspect-ratio: 3/4;
+  max-height: 360px;
+  background: var(--forest-sage);
+  overflow: hidden;
+}
+.media-output-preview .ant-image {
+  width: 100%;
+  height: 100%;
+}
+.media-output-preview img,
+.media-output-preview video {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.media-output-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+}
+.media-result-history {
+  border: 1px solid var(--forest-line);
+  border-radius: 14px;
+  padding: 16px;
+}
+.media-result-history summary {
+  cursor: pointer;
+  color: var(--forest-muted);
+  font-size: 13px;
+}
+.media-result-history[open] summary {
+  margin-bottom: 16px;
+}
+@media (max-width: 1150px) {
+  .media-property-grid,
+  .media-rewrite-video .media-property-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .media-model-field {
+    grid-column: span 2;
+  }
+  .media-rewrite-video .media-model-field {
+    grid-column: auto;
+  }
+  .media-rewrite-image .media-property-grid .workflow-field:last-child {
+    grid-column: span 2;
+  }
+}
+@media (max-width: 600px) {
+  .video-script-actions {
+    width: 100%;
+  }
+  .video-script-actions .ant-select {
+    flex: 1;
+  }
+  .media-rewrite-video .media-source-carousel.title-original-media {
+    height: 240px;
+    min-height: 0;
+  }
+  .media-property-grid,
+  .media-rewrite-video .media-property-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+  }
+  .media-model-field,
+  .media-rewrite-image .media-property-grid .workflow-field:last-child {
+    grid-column: 1/-1;
+  }
+  .media-rewrite-video .media-model-field {
+    grid-column: auto;
+  }
+  .media-generate-row > .ant-btn {
+    width: 100%;
+  }
+  .media-output-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .media-output-card {
+    max-width: 360px;
+  }
+  .media-generate-row > span {
+    width: 100%;
+  }
+}

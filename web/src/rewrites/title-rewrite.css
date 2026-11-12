@@ -1,0 +1,203 @@
+.title-original-note {
+  display: grid;
+  grid-template-columns: minmax(150px, min(28%, 210px)) minmax(0, 1fr);
+  gap: 22px;
+  align-items: stretch;
+}
+.title-original-media {
+  position: relative;
+  width: 100%;
+  align-self: start;
+  aspect-ratio: 3 / 4;
+  max-height: 280px;
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--forest-line);
+  border-radius: 12px;
+  background: var(--forest-sage);
+}
+.title-original-media .ant-image {
+  width: 100%;
+  height: 100%;
+}
+.title-original-media .ant-image-img,
+.title-original-media > video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+}
+.title-original-media > video {
+  object-fit: contain;
+  background: #202921;
+}
+.title-original-media > .ant-empty {
+  display: grid;
+  align-content: center;
+  height: 100%;
+  margin: 0;
+  font-size: 12px;
+}
+.title-original-content {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
+.title-source-label {
+  display: block;
+  margin-bottom: 0;
+  color: var(--forest-muted);
+  font-size: 12px;
+}
+.title-original-copy .title-source-label {
+  margin-bottom: 6px;
+}
+.title-original-content > h3 {
+  margin: 0;
+  font-size: 20px;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+.title-original-copy {
+  flex: 1;
+  min-height: 100px;
+  max-height: 220px;
+  overflow: auto;
+  padding: 14px;
+  border: 1px solid var(--forest-line);
+  border-radius: 10px;
+  background: var(--forest-paper);
+  font-size: 13px;
+  line-height: 1.9;
+}
+.title-original-copy p {
+  margin: 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.title-original-topics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 10px;
+  margin-top: 12px;
+  color: var(--forest-accent);
+}
+.title-rewrite-panel .workflow-field {
+  margin: 0;
+  min-width: 0;
+}
+.title-system-prompt {
+  color: var(--forest-muted);
+  background: var(--forest-paper);
+  font-size: 12px;
+}
+.title-generate-toolbar {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(90px, 0.7fr) minmax(
+      104px,
+      0.7fr
+    );
+  gap: 12px;
+  align-items: end;
+  width: 100%;
+}
+.title-model-control,
+.title-generate-toolbar > .workflow-field {
+  min-width: 0;
+}
+.title-generate-toolbar > .ant-btn {
+  width: 100%;
+  height: 40px;
+}
+.title-result-panel {
+  display: grid;
+  gap: 16px;
+  padding-top: 4px;
+  min-width: 0;
+}
+.title-result-panel > h3 {
+  margin: 0;
+  font-size: 16px;
+}
+.title-result-panel fieldset {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+}
+.title-result-panel .workflow-field > span {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px;
+}
+.title-result-panel .workflow-field small {
+  color: var(--forest-muted);
+  font-size: 12px;
+}
+.title-result-panel .ant-input-textarea {
+  margin-bottom: 22px;
+}
+.title-result-panel .workflow-candidate-choice {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  width: 100%;
+  margin: 0;
+  padding: 16px;
+  color: var(--forest-ink);
+}
+.title-result-panel .workflow-candidate-choice > .ant-checkbox {
+  margin-top: 4px;
+}
+.title-result-panel .workflow-candidate-choice > span:last-child {
+  flex: 1;
+  min-width: 0;
+  padding: 0;
+}
+.workflow-candidate-content {
+  display: grid;
+  gap: 8px;
+  overflow-wrap: anywhere;
+  line-height: 1.7;
+}
+.workflow-candidate-content > small,
+.workflow-saved-version {
+  color: var(--forest-muted);
+  font-size: 12px;
+}
+.creation-workflow .title-result-panel .workflow-candidates > article.selected {
+  border-color: var(--forest-accent);
+  background: var(--forest-sage);
+  box-shadow: none;
+}
+.title-original-copy p:empty + .title-original-topics {
+  margin-top: 0;
+}
+.title-rewrite-panel .workflow-next > .ant-btn {
+  min-width: 112px;
+  height: 40px;
+}
+@media (max-width: 600px) {
+  .title-original-note {
+    grid-template-columns: minmax(100px, 0.65fr) minmax(0, 1.35fr);
+    gap: 12px;
+  }
+  .title-original-content > h3 {
+    font-size: 16px;
+  }
+  .title-original-copy {
+    min-height: 100px;
+    max-height: 160px;
+    padding: 10px;
+    font-size: 12px;
+  }
+  .title-generate-toolbar {
+    grid-template-columns: minmax(0, 1fr) 90px;
+  }
+  .title-generate-toolbar > .ant-btn {
+    grid-column: 1 / -1;
+    margin-top: 0;
+  }
+}

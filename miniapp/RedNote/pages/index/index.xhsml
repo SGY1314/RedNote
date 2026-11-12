@@ -1,0 +1,37 @@
+<view class="home-page">
+  <view class="home-intro">
+    <view class="home-brand">
+      <view class="brand-mark">N<view class="brand-accent"></view></view>
+      <view><view class="brand-title">RedNote 笔记助手</view><view class="brand-subtitle">本地生活探店笔记工具</view></view>
+    </view>
+    <view class="intro-description">帮助餐饮、零售等本地商家，让真实到店用户轻松记录探店体验。</view>
+  </view>
+  <view class="home-sections">
+    <view class="section-heading">使用流程</view>
+    <view class="surface steps-card">
+      <view class="flow-step"><view class="step-number">1</view><view class="step-copy"><view class="step-title">商家后台创建参考素材</view><view class="muted">准备门店照片、菜品介绍等内容，生成专属二维码</view></view></view>
+      <view class="flow-step"><view class="step-number">2</view><view class="step-copy"><view class="step-title">到店用户扫码进入编辑器</view><view class="muted">参考素材自动载入，可根据真实体验自由修改</view></view></view>
+      <view class="flow-step"><view class="step-number">3</view><view class="step-copy"><view class="step-title">确认内容，主动发布到小红书</view><view class="muted">所有内容由用户本人确认并点击发布</view></view></view>
+    </view>
+    <view class="scan-guide">
+      <view class="scan-symbol"><view></view></view>
+      <view class="scan-guide-copy"><view>{{opening ? '正在打开参考笔记…' : '使用小红书扫一扫'}}</view><view class="muted">扫描商家二维码，开始记录探店体验</view></view>
+    </view>
+    <view xhs:if="{{launchError}}" class="error home-error">{{launchError}}</view>
+    <view class="section-heading recent-heading">参考笔记<text class="section-caption">点击体验创作流程</text></view>
+    <scroll-view class="recent-scroll" scroll-x="{{true}}">
+      <view class="recent-row">
+        <view xhs:for="{{referenceNotes}}" xhs:key="id" class="recent-card surface" bindtap="openNote" data-id="{{item.id}}">
+          <view class="recent-cover"><image xhs:if="{{item.coverUrl}}" src="{{item.coverUrl}}" mode="aspectFill" /><view xhs:else class="recent-video">▷<text>视频笔记</text></view><text xhs:if="{{item.isExample}}" class="reference-badge">示例</text><text class="recent-count">{{item.mediaCount}} {{item.isVideo ? '个视频' : '张图片'}}</text></view>
+          <view class="recent-copy"><view class="recent-title">{{item.title}}</view><view class="recent-summary muted">{{item.summary}}</view><view class="recent-topics"><text xhs:for="{{item.topics}}" xhs:for-item="topic" xhs:key="*this">#{{topic}} </text></view></view>
+        </view>
+      </view>
+    </scroll-view>
+    <view class="surface ownership-note">
+      <view class="ownership-title"><view class="ownership-dot"></view>使用说明</view>
+      <view class="muted">本工具帮助到店用户记录真实探店体验。商家可提供参考素材，用户根据自身实际体验修改后，主动选择是否发布到小红书。</view>
+      <view class="muted ownership-divider">不会自动发布，也不会在用户不知情的情况下发布任何笔记。</view>
+    </view>
+    <view class="home-footer">RedNote · 记录真实探店体验</view>
+  </view>
+</view>

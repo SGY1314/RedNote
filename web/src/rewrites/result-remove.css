@@ -1,0 +1,24 @@
+.media-rewrite-panel .media-result-remove.ant-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 5;
+  width: 30px;
+  height: 30px;
+  color: var(--forest-ink, #2c493f);
+  background: var(--forest-card, #fff);
+  box-shadow: 0 1px 5px #0002;
+  border-radius: 8px;
+}
+.media-rewrite-panel .media-result-remove.ant-btn:hover {
+  color: #b33d36;
+}
+.media-system-prompt {
+  min-width: 0;
+}
+.video-result-caption > span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

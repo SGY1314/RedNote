@@ -1,0 +1,220 @@
+.task-modal .ant-modal-content {
+  padding: 44px 20px 16px;
+}
+.task-modal .ant-modal-body {
+  gap: 14px;
+}
+.task-modal .task-list {
+  gap: 12px;
+}
+.task-modal .task-dialog-toolbar {
+  grid-template-columns: minmax(180px, 30%) 124px minmax(0, 1fr);
+  gap: 12px;
+  flex-shrink: 0;
+}
+.task-modal .task-list > .task-project-card {
+  display: block;
+  align-self: center;
+  width: calc(100% - 48px);
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 16px;
+  background: #fff;
+  border: 1px solid #e3e8ef;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgb(16 24 40 / 4%);
+}
+.task-project-heading {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 12px;
+}
+.task-project-identity {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+.task-project-identity > div {
+  min-width: 0;
+}
+.task-project-identity strong {
+  display: block;
+  color: #28313b;
+  font-size: 16px;
+  line-height: 24px;
+  overflow-wrap: anywhere;
+}
+.task-project-icon {
+  display: grid;
+  place-items: center;
+  flex: 0 0 40px;
+  height: 40px;
+  border-radius: 12px;
+  color: #2f5d4b;
+  background: #edf4f0;
+  font-size: 20px;
+}
+.task-project-labels {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 4px;
+  color: #667085;
+  font-size: 12px;
+}
+.task-project-labels .ant-tag {
+  margin: 0;
+}
+.task-project-meta {
+  display: flex;
+  flex-shrink: 0;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  color: #8a94a3;
+  font-size: 12px;
+}
+.task-project-meta .task-project-delete.ant-btn {
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  color: #667085;
+  padding: 4px 8px;
+  font-size: 12px;
+}
+.task-project-meta .task-project-delete.ant-btn:hover {
+  background: #f2f4f7;
+  color: #344054;
+}
+.task-project-meta .task-project-delete.ant-btn:disabled {
+  color: #b5bdc8;
+}
+.task-project-progress {
+  margin: 10px 0 4px;
+}
+.task-project-progress-label {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px;
+  color: #667085;
+  font-size: 12px;
+}
+.task-project-progress-label b {
+  font-weight: 500;
+  color: #b45348;
+}
+.task-project-failures {
+  margin: 12px 0;
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+  border-radius: 8px;
+  background: #fff5f3;
+  color: #ac4e43;
+  font-size: 13px;
+}
+.task-project-failures > div {
+  display: flex;
+  align-items: start;
+  gap: 8px;
+}
+.task-project-failures .anticon {
+  margin-top: 4px;
+}
+.task-project-failures span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.task-project-details {
+  margin-top: 4px;
+}
+.task-project-details summary {
+  cursor: pointer;
+  color: #667085;
+  font-size: 12px;
+  padding: 4px 0;
+}
+.task-project-details ul {
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 8px;
+}
+.task-project-details li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 8px;
+  background: #f8fafc;
+  color: #475467;
+}
+.task-step-name {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+  flex: 1;
+}
+.task-step-name strong {
+  font-size: 13px;
+  font-weight: 600;
+}
+.task-step-name > span {
+  font-size: 12px;
+  color: #667085;
+  overflow-wrap: anywhere;
+}
+.task-project-details li.task-step-failed {
+  background: #fff7f5;
+  border-inline-start: 2px solid #d27867;
+}
+.task-project-details .ant-tag {
+  margin: 0;
+  flex-shrink: 0;
+}
+@media (max-width: 900px) {
+  .task-modal .task-dialog-toolbar {
+    grid-template-columns: minmax(0, 1fr) 136px;
+  }
+  .task-modal .task-dialog-toolbar .ant-segmented {
+    grid-column: 1/-1;
+  }
+  .task-project-heading {
+    flex-wrap: wrap;
+  }
+  .task-project-meta {
+    margin-left: auto;
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+  }
+}
+@media (max-width: 480px) {
+  .task-modal .task-list > .task-project-card {
+    width: 100%;
+    padding: 16px;
+  }
+  .task-modal .task-dialog-toolbar {
+    grid-template-columns: minmax(0, 1fr) 124px;
+    gap: 12px;
+  }
+  .task-project-heading {
+    gap: 12px;
+  }
+  .task-project-meta {
+    width: 100%;
+    justify-content: space-between;
+  }
+  .task-project-details li {
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .task-step-name {
+    flex-basis: calc(100% - 90px);
+  }
+}

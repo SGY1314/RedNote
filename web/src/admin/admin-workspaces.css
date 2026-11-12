@@ -1,0 +1,363 @@
+.admin-shell .admin-users-page,
+.admin-shell .admin-model-page {
+  --admin-workspace-shadow: 0 3px 14px #172b1f06;
+  color: var(--forest-ink);
+}
+.admin-shell .admin-users-page {
+  padding: 24px;
+  box-shadow: var(--admin-workspace-shadow);
+}
+.admin-users-heading,
+.admin-users-heading > div {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.admin-users-heading {
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+.admin-users-heading strong {
+  font-size: 18px;
+}
+.admin-users-heading > div > span,
+.admin-shell .admin-user-cell small {
+  color: var(--forest-muted);
+  font-size: 12px;
+}
+.admin-shell .admin-users-page .admin-list-toolbar {
+  display: grid;
+  grid-template-columns: minmax(180px, 1fr) 128px 128px;
+  gap: 10px;
+  margin-bottom: 20px;
+  padding: 16px;
+  background: var(--forest-canvas);
+  border-radius: 10px;
+}
+.admin-users-page .admin-list-toolbar > .ant-select {
+  width: 100%;
+  min-width: 0;
+}
+.admin-shell .admin-users-page .ant-table {
+  min-width: 0;
+}
+.admin-shell .admin-users-page .ant-table-cell {
+  padding: 18px 12px;
+  font-size: 13px;
+}
+.admin-shell .admin-users-page .ant-table-thead > tr > th {
+  padding-block: 12px;
+}
+.admin-users-page .admin-user-cell {
+  align-items: flex-start;
+  gap: 12px;
+  min-width: 0;
+}
+.admin-users-page .admin-avatar {
+  width: 36px;
+  height: 36px;
+  margin-top: 3px;
+  color: var(--forest-accent);
+  background: var(--forest-sage);
+  border-radius: 12px;
+}
+.admin-users-page .admin-user-cell > div {
+  flex: 1;
+  min-width: 0;
+  gap: 3px;
+}
+.admin-user-name {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+.admin-user-name strong {
+  font-size: 14px;
+  color: var(--forest-ink);
+}
+.admin-user-name strong,
+.admin-users-page .admin-user-cell small,
+.admin-user-note {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.admin-users-page .admin-user-name .admin-current-user {
+  flex-shrink: 0;
+  padding: 1px 5px;
+  border-radius: 4px;
+  color: var(--forest-accent);
+  background: var(--forest-sage);
+  font-size: 10px;
+}
+.admin-user-note {
+  color: var(--forest-muted);
+  margin: 2px 0 0;
+  font-size: 12px;
+}
+.admin-user-times {
+  display: grid;
+  gap: 5px;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+.admin-user-times > span {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+.admin-user-times small {
+  color: var(--forest-muted);
+  font-size: 11px;
+}
+.admin-shell .admin-user-actions .ant-btn {
+  height: 32px;
+  padding-inline: 6px;
+  color: var(--forest-accent);
+}
+.admin-user-actions .ant-btn-icon-only {
+  width: 32px;
+}
+.admin-shell .admin-users-page .ant-table-cell-fix-right {
+  background: var(--forest-paper);
+}
+.admin-shell .admin-users-page .ant-table-thead .ant-table-cell-fix-right {
+  background: var(--forest-canvas);
+}
+
+.admin-shell .admin-model-page {
+  gap: 20px;
+}
+.admin-shell .admin-model-top {
+  align-items: center;
+  gap: 20px;
+}
+.admin-shell .admin-model-top h2 {
+  margin: 0 0 6px;
+  font-family: inherit;
+  font-size: 18px;
+  color: var(--forest-ink);
+}
+.admin-shell .admin-model-top p {
+  max-width: 650px;
+  color: var(--forest-muted);
+  font-size: 12px;
+  line-height: 1.8;
+}
+.admin-model-top > .ant-btn {
+  flex-shrink: 0;
+}
+.admin-shell .admin-capability-tabs {
+  margin: 0;
+  padding: 7px;
+  background: var(--forest-paper);
+  border: 1px solid var(--forest-line);
+  border-radius: 12px;
+}
+.admin-shell .admin-capability-tabs .ant-segmented-group {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+}
+.admin-shell .admin-capability-tabs .ant-segmented-item {
+  min-width: 0;
+  min-height: 40px;
+  color: var(--forest-muted);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 7px;
+}
+.admin-shell .admin-capability-tabs .ant-segmented-item:hover {
+  color: var(--forest-accent);
+  background: var(--forest-sage);
+}
+.admin-shell .admin-capability-tabs .ant-segmented-item-selected,
+.admin-shell .admin-capability-tabs .ant-segmented-item-selected:hover {
+  color: #fff;
+  background: var(--forest-accent);
+  border-color: var(--forest-accent);
+  box-shadow: 0 2px 5px #172b1f14;
+}
+.admin-capability-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 38px;
+}
+.admin-shell .admin-model-group {
+  padding: 24px;
+  background: var(--forest-paper);
+  border-color: var(--forest-line);
+  box-shadow: var(--admin-workspace-shadow);
+}
+.admin-shell .admin-model-group-head {
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 22px;
+}
+.admin-shell .admin-model-icon {
+  width: 42px;
+  height: 42px;
+  color: var(--forest-accent);
+  background: var(--forest-sage);
+}
+.admin-shell .admin-model-group-head strong {
+  font-size: 17px;
+  color: var(--forest-ink);
+}
+.admin-shell .admin-model-group-head small,
+.admin-model-count {
+  color: var(--forest-muted);
+  font-size: 12px;
+  line-height: 1.8;
+}
+.admin-model-count {
+  white-space: nowrap;
+}
+.admin-shell .admin-model-list {
+  gap: 12px;
+}
+.admin-model-entry {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-width: 0;
+  padding: 16px;
+  background: var(--forest-paper);
+  border: 1px solid var(--forest-line);
+  border-radius: 12px;
+}
+.admin-model-entry:hover {
+  border-color: var(--forest-accent);
+}
+.admin-shell .admin-model-row,
+.admin-shell .admin-model-row:hover {
+  flex: 1;
+  min-width: 0;
+  gap: 14px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+.admin-shell .admin-model-row-icon {
+  width: 36px;
+  height: 36px;
+  color: var(--forest-accent);
+  background: var(--forest-canvas);
+}
+.admin-shell .admin-model-row-copy {
+  gap: 3px;
+}
+.admin-shell .admin-model-row-copy strong {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: var(--forest-ink);
+  font-size: 15px;
+}
+.admin-shell .admin-model-row-copy small {
+  color: var(--forest-muted);
+  font-family: Consolas, "SFMono-Regular", monospace;
+  font-size: 12px;
+}
+.admin-shell .admin-model-row-copy em {
+  color: var(--forest-muted);
+  font-size: 11px;
+}
+.admin-model-entry-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-shrink: 0;
+  gap: 8px;
+}
+.admin-model-entry-actions .ant-tag {
+  margin: 0 4px 0 0;
+  white-space: nowrap;
+}
+@media (min-width: 1500px) {
+  .admin-shell .admin-capability-tabs .ant-segmented-group {
+    grid-template-columns: repeat(8, minmax(0, 1fr));
+  }
+}
+@media (max-width: 1000px) {
+  .admin-model-entry {
+    flex-wrap: wrap;
+  }
+  .admin-shell .admin-model-row {
+    flex-basis: 100%;
+  }
+  .admin-model-entry-actions {
+    width: 100%;
+    padding-top: 12px;
+    border-top: 1px solid var(--forest-line);
+  }
+}
+@media (max-width: 700px) {
+  .admin-shell .admin-users-page {
+    padding: 16px;
+  }
+  .admin-shell .admin-users-page .admin-list-toolbar {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    padding: 12px;
+  }
+  .admin-users-page .admin-list-toolbar > .ant-input-affix-wrapper {
+    grid-column: 1 / -1;
+  }
+  .admin-shell .admin-users-page .ant-table-cell {
+    padding: 8px 12px;
+  }
+  .admin-users-page td:has(.admin-user-cell) {
+    grid-column: 1 / -1;
+  }
+  .admin-shell .admin-user-actions .ant-btn {
+    height: 38px;
+  }
+  .admin-users-heading {
+    gap: 8px;
+  }
+  .admin-users-heading > div {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+  }
+  .admin-shell .admin-model-top {
+    align-items: stretch;
+  }
+  .admin-shell .admin-model-group {
+    padding: 16px;
+  }
+  .admin-shell .admin-model-group-head > div:nth-child(2) {
+    flex-basis: calc(100% - 60px);
+  }
+  .admin-shell .admin-model-group-head > .ant-btn {
+    margin-left: auto;
+  }
+  .admin-model-entry {
+    padding: 12px;
+  }
+  .admin-shell .admin-capability-tabs .ant-segmented-group {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+html[data-theme="pixel"]
+  .admin-shell
+  :is(
+    .admin-model-entry,
+    .admin-current-user,
+    .admin-model-icon,
+    .admin-avatar,
+    .admin-capability-tabs,
+    .admin-capability-tabs .ant-segmented-item
+  ) {
+  border-radius: 0;
+}
+html[data-theme="pixel"]
+  .admin-shell
+  .admin-capability-tabs
+  .ant-segmented-item-selected {
+  color: #090909;
+}

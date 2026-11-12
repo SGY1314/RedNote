@@ -1,0 +1,8 @@
+{
+  "listen": "127.0.0.1:8080",
+  "data_dir": "data",
+  "model_presets": "config/model-presets.json",
+  "collector_url": "http://127.0.0.1:5556",
+  "publisher_url": "http://127.0.0.1:18060",
+  "web_dir": "web/dist"
+}

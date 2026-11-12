@@ -1,0 +1,47 @@
+.reference-input-panel {
+  margin-bottom: 20px;
+  padding: 16px;
+  border: 1px solid var(--border-color, #dce4e9);
+  border-radius: 16px;
+}
+.reference-input-columns {
+  display: grid;
+  grid-template-columns: minmax(150px, 0.7fr) minmax(0, 1.3fr);
+  gap: 20px;
+}
+.reference-input-text {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.reference-input-text > div,
+.reference-input-text > label {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.reference-input-inactive {
+  background: var(--surface-muted, #f3f4f5);
+  border-radius: 10px;
+}
+.reference-input-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  margin-top: 14px;
+}
+.reference-input-panel .media-source-stage {
+  height: 260px;
+  min-height: 0;
+}
+.reference-input-panel .media-source-stage img {
+  max-height: 260px;
+  object-fit: contain;
+}
+.reference-input-panel .ant-checkbox-wrapper {
+  margin-bottom: 8px;
+}
+
+.creation-workflow .reference-input-panel .media-source-carousel.title-original-media {position:relative;height:280px;min-height:280px;max-height:280px;align-self:start;aspect-ratio:auto;}
+.creation-workflow .reference-input-panel .media-source-stage {height:100%;}

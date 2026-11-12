@@ -1,0 +1,20 @@
+const {chromium,fs,path,assert,routeAPI,jobs,assets,stamp}=require('./direct-media-fixture.cjs');
+(async()=>{
+const out=path.resolve(__dirname,'../../data/verification/collection-audit');await fs.mkdir(out,{recursive:true});const observations=[];
+const browser=await chromium.launch({headless:true,executablePath:'C:/Program Files/Google/Chrome/Application/chrome.exe'});
+try{
+const page=await browser.newPage({viewport:{width:1124,height:884},reducedMotion:'reduce'});page.setDefaultTimeout(12000);const errors=[];page.on('pageerror',e=>errors.push(e.message));
+const note={id:'audit-note',note_id:'audit-note',revision_id:'r-media',title:'采集流程审计笔记',body:'测试文案',topics:[],tags:[],author:'测试作者',platform:'xhs',kind:'image',url:'https://www.xiaohongshu.com/explore/audit',created_at:stamp,updated_at:stamp};let serial=0;
+await page.route('**/api/v1/**',async route=>{const req=route.request(),e=new URL(req.url()).pathname.slice(7);
+if(e==='/profile/default')return route.fulfill({json:{}});if(e==='/prompt-presets')return route.fulfill({json:[]});
+if(e==='/collections'&&req.method()==='GET')return route.fulfill({json:{items:[note],total:1,tags:[]}});
+if(e==='/collections/audit-note')return route.fulfill({json:{note,revision:{id:'r-media',title:note.title,body:note.body,topics:[]},assets:assets.filter(a=>a.id==='source-1'),history:[],extractions:[],jobs}});
+if(e.endsWith('/extract')){const id='audit-extraction-'+(++serial);jobs.push({id,kind:'ocr',target:'source-1',state:'running',stage:'识别图片文字',created_at:stamp,updated_at:stamp});return route.fulfill({json:{job_id:id}});}
+if(e==='/collections'&&req.method()==='POST'){jobs.push({id:'audit-capture',kind:'collect',target:note.url,result:note.id,state:'succeeded',stage:'完成',created_at:stamp,updated_at:stamp},{id:'audit-download',kind:'download',target:'source-1',state:'running',stage:'下载并检查媒体',task_project:{category:'collect',id:note.id,name:note.title},created_at:stamp,updated_at:stamp});return route.fulfill({json:{items:[{job_id:'audit-capture',url:note.url}]}});}
+return routeAPI(route);
+});
+await page.goto('http://127.0.0.1:8081/#collections');await page.locator('.collection-card').first().press('Enter');const modal=page.getByRole('dialog',{name:'笔记详情',exact:true});await modal.waitFor();await modal.getByRole('button',{name:/提取文字/}).click();await page.getByText('文字提取处理中…',{exact:true}).waitFor();await modal.locator('.ant-modal-close').click();await page.evaluate(()=>location.hash='#rewrites');await page.getByRole('navigation',{name:'仿写创作步骤',exact:true}).waitFor();const job=jobs.find(j=>j.id==='audit-extraction-1');job.state='succeeded';job.updated_at='2026-11-08T12:00:00Z';await page.waitForTimeout(1800);assert.equal(await page.getByText('文字提取成功，请查看结果',{exact:true}).count(),0);assert.equal(await page.getByText('文字提取处理中…',{exact:true}).count(),1);observations.push({id:'C1',finding:'离开采集页后OCR完成，永久处理中提示未清理，也没有完成反馈'});await page.screenshot({path:path.join(out,'ocr-after-navigation.png')});
+await page.evaluate(()=>location.hash='#collections');await page.locator('.collection-card').first().waitFor();await page.locator('textarea:visible').first().fill(note.url);await page.getByRole('button',{name:/开始采集/}).click();const capture=page.getByRole('dialog',{name:'本次采集进度',exact:true});await capture.waitFor();await capture.getByText('下载并检查媒体',{exact:true}).waitFor();assert((await capture.innerText()).match(/已完成\s+1\s*\/\s*1/));observations.push({id:'C2',finding:'素材仍在下载时，采集弹窗已显示完成1/1'});await page.screenshot({path:path.join(out,'capture-complete-before-media.png')});
+const root=jobs.find(j=>j.id==='audit-capture');root.state='failed';root.error='采集测试失败';root.updated_at='2026-11-08T12:01:00Z';await capture.getByText(root.error,{exact:true}).waitFor();assert((await capture.innerText()).match(/已完成\s+1\s*\/\s*1/));observations.push({id:'C3',finding:'采集失败仍计入已完成，未区分成功与失败计数'});assert.deepEqual(errors,[]);await fs.writeFile(path.join(out,'observations.json'),JSON.stringify(observations,null,2));console.log(JSON.stringify(observations));
+}finally{await browser.close()}
+})().catch(e=>{console.error(e);process.exit(1)});

@@ -1,0 +1,1000 @@
+@font-face {
+  font-family: "Fusion Pixel";
+  src: url("/fonts/fusion-pixel/fusion-pixel-12px-zh-hans.woff2")
+    format("woff2");
+  font-weight: 400 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+.theme-option-pixel .theme-preview {
+  position: relative;
+  padding: 0;
+  background: #050505;
+}
+.pixel-sky-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+}
+html[data-theme="pixel"] {
+  color-scheme: dark;
+  --pixel-font: "Fusion Pixel", Consolas, "Microsoft YaHei", monospace;
+  --forest-sidebar: #080808;
+  --forest-sidebar-hover: #242422;
+  --forest-ink: #e5e5df;
+  --forest-muted: #aeaea6;
+  --forest-accent: #e5e5df;
+  --forest-canvas: #050505;
+  --forest-paper: #141414;
+  --forest-sage: #2c2c28;
+  --forest-line: #44443e;
+  --forest-gold: #e5e5df;
+  --forest-gold-hover: #ffffff;
+  --forest-gold-active: #bfbfb5;
+  --button-primary-text: #090909;
+  --button-disabled-bg: #252522;
+  --button-disabled-text: #7b7b72;
+  --rednote-panel: #1b1b19;
+  --rednote-line-soft: #30302d;
+  --rednote-sage: #aaaaa0;
+  --surface-shadow: 4px 4px 0 #00000090;
+  --task-progress-accent: #cfcfc4;
+}
+html[data-theme="pixel"] body {
+  background: #050505;
+  color: #e5e5df;
+}
+html[data-theme="pixel"] .rednote-shell {
+  position: relative;
+  isolation: isolate;
+  background: #050505;
+}
+html[data-theme="pixel"] .rednote-shell .main-shell {
+  position: relative;
+  z-index: 1;
+  background: transparent;
+}
+html[data-theme="pixel"] .pixel-backdrop {
+  display: block;
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  contain: strict;
+  background: #050505;
+}
+.pixel-backdrop .pixel-sky-canvas {
+  height: calc(100% + 120px);
+  transform: translate3d(0, var(--pixel-scroll, 0px), 0);
+}
+.pixel-twinkles {
+  position: absolute;
+  top: 11%;
+  left: 45%;
+  width: 4px;
+  height: 4px;
+  background: #bcbcb6;
+  box-shadow:
+    -220px 102px #6f6f6a,
+    310px 70px #85857c,
+    -90px 297px #adada3,
+    410px 210px #777771;
+  animation: pixel-star-pulse 5s steps(2, end) infinite alternate;
+}
+@keyframes pixel-star-pulse {
+  from {
+    opacity: 0.25;
+  }
+  to {
+    opacity: 0.8;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pixel-twinkles {
+    animation: none;
+    opacity: 0.5;
+  }
+}
+
+html[data-theme="pixel"] .rednote-shell .sidebar {
+  border-radius: 4px;
+  border: 1px solid #55554e;
+  background: #090909d9;
+  box-shadow: 4px 4px 0 #000;
+  backdrop-filter: none;
+}
+html[data-theme="pixel"] .rednote-shell .brand :is(strong, small),
+html[data-theme="pixel"]
+  .rednote-shell
+  .sidebar
+  :is(.nav-item, .sidebar-toggle) {
+  color: #d0d0c5;
+}
+html[data-theme="pixel"] .rednote-shell .brand .brand-wordmark {
+  font: 24px/1.2 var(--pixel-font);
+  letter-spacing: -1px;
+  color: #f5f5ef;
+}
+html[data-theme="pixel"] .rednote-shell .brand-wordmark .brand-spotlight {
+  display: none;
+}
+html[data-theme="pixel"] .rednote-shell .brand-mark {
+  border-radius: 0;
+  background: #e5e5df;
+}
+html[data-theme="pixel"] .rednote-shell .brand-mark img {
+  filter: grayscale(1);
+}
+html[data-theme="pixel"] .rednote-shell .sidebar .nav-item {
+  border-radius: 0;
+  font: 12px/24px var(--pixel-font);
+  border-color: transparent;
+}
+html[data-theme="pixel"] .rednote-shell .sidebar .nav-item > .anticon {
+  border-radius: 0;
+  background: transparent;
+}
+html[data-theme="pixel"] .rednote-shell .sidebar .nav-item:hover {
+  background: #252522;
+  color: #f5f5ef;
+}
+html[data-theme="pixel"] .rednote-shell .sidebar .nav-item.selected {
+  background: #e5e5df;
+  color: #090909;
+  border: 1px solid #fff;
+  box-shadow: 3px 3px 0 #666660;
+}
+html[data-theme="pixel"] .rednote-shell .sidebar .nav-item.selected > .anticon {
+  color: #090909;
+  background: transparent;
+}
+html[data-theme="pixel"] .rednote-shell .sidebar nav .nav-item.selected::after {
+  border-color: #090909;
+}
+html[data-theme="pixel"] .rednote-shell .sidebar .sidebar-toggle {
+  background: #111;
+  border-color: #44443e;
+}
+html[data-theme="pixel"] .rednote-shell .topbar {
+  background: #0c0c0ce8;
+  border-color: #55554e;
+  border-radius: 4px;
+  box-shadow: none;
+}
+html[data-theme="pixel"] .rednote-shell .topbar .workspace-crumb {
+  color: #e5e5df;
+  font: 12px/24px var(--pixel-font);
+}
+html[data-theme="pixel"]
+  :is(.rednote-shell .topbar .ant-btn, .ant-btn-default) {
+  background: #141414;
+  border-color: #55554e;
+  color: #e5e5df;
+}
+
+/* Shared surfaces and text, including panels mounted by lazy page chunks. */
+html[data-theme="pixel"]
+  .rednote-shell
+  :is(
+    .capture-card,
+    .collection-card,
+    .table-panel,
+    .workflow-panel,
+    .publication-stat,
+    .usage-panel,
+    .usage-summary-card,
+    .trash-workspace,
+    .client-settings,
+    .task-page-panel,
+    .embedded-workspace,
+    .publication-mobile-card
+  ) {
+  background: #111111ed;
+  border: 1px solid #484842;
+  border-radius: 2px;
+  box-shadow: 4px 4px 0 #00000080;
+  backdrop-filter: none;
+}
+html[data-theme="pixel"] .rednote-shell .settings-page .client-settings {
+  background: #111111ed;
+  border-color: #606058;
+  border-radius: 2px;
+  box-shadow: 5px 5px 0 #000;
+}
+html[data-theme="pixel"]
+  .rednote-shell
+  :is(
+    .capture-title strong,
+    .panel-tabs strong,
+    .workflow-panel h2,
+    .media-library-heading h2,
+    .project-rail-title,
+    .usage-page-head h1
+  ) {
+  color: #f0f0e8;
+  font-family: var(--pixel-font);
+  font-size: 24px;
+  font-weight: 400;
+  letter-spacing: -1px;
+}
+html[data-theme="pixel"]
+  .rednote-shell
+  :is(.client-settings h3, .workflow-panel h3, .workflow-result-section > h3) {
+  color: #e5e5df;
+  font-family: var(--pixel-font);
+  font-size: 18px;
+  font-weight: 400;
+}
+html[data-theme="pixel"]
+  .rednote-shell
+  :is(
+    .muted,
+    .collection-card-author-name,
+    .collection-card-stats,
+    .collection-note-kind,
+    .author-name,
+    .collection-count-label,
+    .usage-summary-card > span,
+    .usage-summary-card > small
+  ) {
+  color: #aeaea6;
+}
+html[data-theme="pixel"]
+  .rednote-shell
+  :is(
+    .collection-card-body strong,
+    .collection-note-open > strong,
+    .collection-card-copy,
+    .collection-note-dialog-copy,
+    .publication-note strong,
+    .trash-card-content h2,
+    .task-project-identity strong
+  ) {
+  color: #e5e5df;
+}
+html[data-theme="pixel"]
+  .rednote-shell
+  :is(
+    .collection-card-copy,
+    .trash-card-content p,
+    .trash-card-content small,
+    .publication-note small,
+    .publication-times small
+  ) {
+  color: #bcbcb2;
+}
+html[data-theme="pixel"]
+  .rednote-shell
+  :is(
+    .collection-card-tags .ant-tag,
+    .capture-title > .anticon,
+    .collection-grid-empty,
+    .empty-library,
+    .settings-avatar,
+    .collection-note-cover,
+    .collection-card-preview,
+    .collection-card-avatar,
+    .trash-card-placeholder,
+    .trash-media-preview
+  ) {
+  color: #c7c7bc;
+  background: #22221f;
+  border-radius: 0;
+}
+html[data-theme="pixel"] .rednote-shell .collection-card-preview img {
+  background: #191919;
+}
+html[data-theme="pixel"]
+  .rednote-shell
+  :is(
+    .panel-tabs strong > span,
+    .collection-card-actions > a:hover,
+    .collection-card-actions > button:hover,
+    .note-curation-compact .collection-card-add
+  ) {
+  color: #e5e5df;
+  background: #30302b;
+}
+html[data-theme="pixel"]
+  .rednote-shell
+  :is(
+    .collection-card-footer,
+    .client-settings section,
+    .collection-selection-bar
+  ) {
+  border-color: #393934;
+}
+html[data-theme="pixel"] .client-settings-model-note {
+  background: #20201e;
+  border-color: #484842 !important;
+}
+html[data-theme="pixel"] .rednote-shell .collection-card-footer {
+  background: #181818;
+}
+html[data-theme="pixel"] .note-rating .ant-rate:not(.ant-rate-disabled):hover {
+  color: #ffffff;
+}
+html[data-theme="pixel"] .note-rating [role="status"] {
+  color: #aeaea6;
+}
+html[data-theme="pixel"] .client-settings-model-note > .anticon {
+  color: #cfcfc4;
+}
+html[data-theme="pixel"] .settings-avatar {
+  font-family: var(--pixel-font);
+  border: 1px solid #66665e;
+  box-shadow: 3px 3px 0 #000;
+}
+html[data-theme="pixel"] .theme-option {
+  background: #151515;
+  border-color: #4a4a43;
+  border-radius: 2px;
+}
+html[data-theme="pixel"] .theme-option[aria-pressed="true"] {
+  border-color: #e5e5df;
+  box-shadow: 3px 3px 0 #77776d;
+}
+html[data-theme="pixel"] .theme-option-check {
+  color: #e5e5df;
+}
+
+/* Controls use hard edges and small offset shadows rather than a soft glow. */
+html[data-theme="pixel"] .ant-btn {
+  border-radius: 0;
+  font-family: var(--pixel-font);
+  font-size: 12px;
+}
+html[data-theme="pixel"]
+  :is(
+    .rednote-shell,
+    .admin-shell,
+    .rednote-login,
+    .ant-modal,
+    .ant-drawer,
+    .workflow-mobile-dock
+  )
+  .ant-btn-primary:not(:disabled):not(.ant-btn-dangerous) {
+  background: #e5e5df;
+  color: #090909;
+  border-color: #f5f5ef;
+  box-shadow: 3px 3px 0 #62625a;
+}
+html[data-theme="pixel"]
+  :is(
+    .rednote-shell,
+    .admin-shell,
+    .rednote-login,
+    .ant-modal,
+    .ant-drawer,
+    .workflow-mobile-dock
+  )
+  .ant-btn-primary:not(:disabled):not(.ant-btn-dangerous):hover {
+  background: #fff !important;
+  color: #090909;
+  border-color: #fff !important;
+}
+html[data-theme="pixel"]
+  :is(
+    .rednote-shell,
+    .admin-shell,
+    .rednote-login,
+    .ant-modal,
+    .ant-drawer,
+    .workflow-mobile-dock
+  )
+  .ant-btn-primary:not(:disabled):not(.ant-btn-dangerous):active {
+  background: #bfbfb5 !important;
+  color: #090909;
+  box-shadow: 1px 1px 0 #62625a;
+}
+html[data-theme="pixel"]
+  .rednote-shell
+  .capture-foot
+  .capture-start.ant-btn-primary:not(:disabled) {
+  background: #e5e5df;
+  background-image: none;
+  border-color: #fff;
+  box-shadow: 3px 3px 0 #74746a;
+  color: #090909;
+}
+html[data-theme="pixel"]
+  .rednote-shell
+  .capture-foot
+  .capture-start.ant-btn-primary:not(:disabled):hover {
+  background: #fff !important;
+  box-shadow: 4px 4px 0 #74746a;
+  transform: none;
+}
+html[data-theme="pixel"]
+  .rednote-shell
+  .capture-foot
+  .capture-start.ant-btn-primary:not(:disabled):active {
+  background: #bfbfb5 !important;
+  box-shadow: 1px 1px 0 #74746a;
+  transform: none;
+}
+html[data-theme="pixel"] .capture-start.ant-btn::before {
+  background: #c7c7bc;
+  opacity: 0.55;
+}
+html[data-theme="pixel"] .ant-btn.ai-generation-button:not(:disabled),
+html[data-theme="pixel"] .ant-btn.ai-generation-button.ant-btn-loading {
+  background: #e5e5df !important;
+  color: #090909 !important;
+  box-shadow: 3px 3px 0 #62625a;
+}
+html[data-theme="pixel"] .ant-btn.ai-generation-button:not(:disabled):hover {
+  background: #fff !important;
+  box-shadow: 4px 4px 0 #62625a;
+}
+html[data-theme="pixel"] .ant-btn.ai-generation-button:not(:disabled):active {
+  background: #bfbfb5 !important;
+  box-shadow: 1px 1px 0 #62625a;
+}
+html[data-theme="pixel"] .ant-btn:disabled,
+html[data-theme="pixel"]
+  .rednote-shell
+  .capture-foot
+  .capture-start.ant-btn-primary:disabled {
+  background: #252522 !important;
+  background-image: none !important;
+  color: #7b7b72 !important;
+  border-color: #42423b;
+  box-shadow: none;
+}
+html[data-theme="pixel"] .rednote-shell .ant-btn-default:not(:disabled):hover {
+  color: #fff !important;
+  border-color: #e5e5df !important;
+  background: #252522;
+}
+html[data-theme="pixel"]
+  .rednote-shell
+  :is(.capture-card textarea, .note-curation .ant-select-selector) {
+  background: #181818;
+  color: #e5e5df;
+  border-color: #55554e;
+}
+html[data-theme="pixel"]
+  .rednote-shell
+  :is(
+    .capture-card textarea::placeholder,
+    .collection-primary-tools input::placeholder,
+    .collection-primary-tools .ant-select-selection-placeholder
+  ) {
+  color: #92928a;
+}
+html[data-theme="pixel"] .rednote-shell :focus-visible {
+  outline-color: #e5e5df;
+}
+html[data-theme="pixel"]
+  :is(button, a, [role="button"], summary):focus-visible {
+  outline-color: #e5e5df;
+}
+
+html[data-theme="pixel"]
+  .rednote-shell
+  :is(.ant-table, .ant-table-container, .ant-table-content) {
+  background: transparent;
+}
+html[data-theme="pixel"] .rednote-shell .ant-table-thead > tr > th {
+  background: #20201e;
+  color: #d8d8ce;
+  border-color: #484842;
+  font-family: var(--pixel-font);
+  font-size: 12px;
+}
+html[data-theme="pixel"] .rednote-shell .ant-table-tbody > tr > td,
+html[data-theme="pixel"]
+  .rednote-shell
+  .ant-table-tbody
+  > tr:nth-child(even)
+  > td {
+  background: #111;
+  color: #e5e5df;
+  border-color: #33332f;
+}
+html[data-theme="pixel"] .rednote-shell .ant-table-tbody > tr:hover > td {
+  background: #242422;
+}
+html[data-theme="pixel"]
+  .rednote-shell
+  .ant-table-tbody
+  > tr.ant-table-row-selected
+  > td {
+  background: #30302b;
+}
+html[data-theme="pixel"]
+  .rednote-shell
+  .ant-table-tbody
+  > tr
+  > td.ant-table-cell-fix-right {
+  background: #151515;
+}
+html[data-theme="pixel"]
+  .rednote-shell
+  :is(
+    .publication-stat strong,
+    .usage-summary-card > strong,
+    .usage-price-pill strong
+  ) {
+  color: #ededdf;
+  font-family: var(--pixel-font);
+}
+html[data-theme="pixel"]
+  .rednote-shell
+  :is(
+    .publication-stat.selected,
+    .usage-summary-card.primary,
+    .usage-toolbar .ant-segmented,
+    .usage-price-pill
+  ) {
+  background: #252522;
+  color: #bfbfb4;
+  border-color: #66665c;
+}
+html[data-theme="pixel"]
+  .rednote-shell
+  .usage-toolbar
+  .ant-segmented-item-selected {
+  background: #e5e5df;
+  color: #090909;
+}
+html[data-theme="pixel"] .rednote-shell .usage-summary-card > span {
+  color: #b8b8ac;
+}
+html[data-theme="pixel"] .rednote-shell .usage-summary-card > small {
+  color: #999990;
+}
+html[data-theme="pixel"] :is(.usage-bar-input, .usage-legend .legend-input) {
+  background: #d0d0c4;
+}
+html[data-theme="pixel"] :is(.usage-bar-output, .usage-legend .legend-output) {
+  background: #74746b;
+}
+
+html[data-theme="pixel"] .rednote-shell .rewrite-project-rail {
+  background: #0f0f0fe8;
+  border-color: #505048;
+  border-radius: 2px;
+  box-shadow: none;
+}
+html[data-theme="pixel"]
+  .rednote-shell
+  .rewrite-project-rail
+  .project-rail-item {
+  border-radius: 0;
+}
+html[data-theme="pixel"]
+  .rednote-shell
+  .rewrite-project-rail
+  .project-rail-item.selected {
+  background: #292925;
+  border-color: #d0d0c4;
+  box-shadow: 3px 3px 0 #000;
+}
+html[data-theme="pixel"] .rednote-shell .project-title-button {
+  color: #d0d0c4;
+}
+html[data-theme="pixel"] .creation-workflow {
+  color: #e5e5df;
+}
+html[data-theme="pixel"]
+  .creation-workflow
+  .workflow-navigation
+  .workflow-steps.workflow-icon-toolbar {
+  border-radius: 2px;
+  background: #101010ed;
+  border-color: #66665c;
+  box-shadow: 3px 3px 0 #000;
+}
+html[data-theme="pixel"]
+  .creation-workflow
+  .workflow-navigation
+  .workflow-icon-toolbar
+  .ant-btn.workflow-step-button {
+  border-radius: 0;
+  color: #aaa;
+}
+html[data-theme="pixel"]
+  .creation-workflow
+  .workflow-navigation
+  .workflow-icon-toolbar
+  .workflow-step-button[aria-current="step"] {
+  background: #deded3;
+  color: #0a0a0a;
+  box-shadow: none;
+}
+html[data-theme="pixel"]
+  .creation-workflow
+  .workflow-navigation
+  .workflow-icon-toolbar
+  .workflow-step-button:not(:disabled):hover {
+  background: #383831;
+  color: #fff;
+}
+html[data-theme="pixel"]
+  .creation-workflow
+  :is(
+    .workflow-field > span,
+    .workflow-save-state,
+    .original-creation-field > span
+  ) {
+  color: #b5b5aa;
+}
+html[data-theme="pixel"]
+  .creation-workflow
+  :is(
+    .workflow-result-panel,
+    .workflow-config,
+    .workflow-reference,
+    .workflow-history,
+    .title-original-copy,
+    .original-input-preview,
+    .workflow-compact-card,
+    .image-upload-card,
+    .media-output-card,
+    .video-result-card
+  ) {
+  background: #191917;
+  border-color: #44443c;
+  border-radius: 2px;
+  color: #d7d7cd;
+  box-shadow: none;
+}
+html[data-theme="pixel"]
+  .creation-workflow
+  :is(.title-original-copy p, .title-original-topics, .media-copy-context h3) {
+  color: #d7d7cd;
+}
+html[data-theme="pixel"]
+  .rednote-shell
+  :is(.image-result-timeline, .video-result-carousel, .source-media-empty) {
+  background: #101010;
+  color: #a0a095;
+  border-radius: 2px;
+}
+html[data-theme="pixel"]
+  .rednote-shell
+  :is(
+    .image-upload-card .image-timeline-dropzone .ant-upload-drag,
+    .video-result-dropzone .ant-upload.ant-upload-drag
+  ) {
+  background: #1d1d19;
+  color: #d0d0c4;
+}
+html[data-theme="pixel"]
+  .rednote-shell
+  :is(
+    .image-upload-prompt,
+    .video-upload-prompt,
+    .image-timeline-date,
+    .video-result-arrow,
+    .video-result-position
+  ) {
+  color: #bdbdb1;
+}
+html[data-theme="pixel"] .rednote-shell .image-timeline-date small {
+  color: #999990;
+}
+html[data-theme="pixel"] .image-timeline-track::before {
+  background: #4a4a42;
+}
+html[data-theme="pixel"] .image-timeline-entry::before {
+  background: #deded3;
+  box-shadow: 0 0 0 3px #383831;
+  border-color: #111;
+  border-radius: 0;
+}
+html[data-theme="pixel"]
+  .rednote-shell
+  :is(
+    .media-output-card.is-selected,
+    .image-upload-card.is-selected,
+    .video-result-card.is-selected
+  ) {
+  border-color: #ededdf;
+}
+html[data-theme="pixel"] .workflow-mobile-dock {
+  background: #101010f5;
+  border-color: #606057;
+  box-shadow: 0 -3px 0 #000;
+}
+
+/* Dialogs and menus live outside the workspace shell. */
+html[data-theme="pixel"]
+  :is(
+    .ant-modal-content,
+    .ant-modal-header,
+    .ant-drawer-content,
+    .ant-drawer-header
+  ) {
+  background: #151515;
+  color: #e5e5df;
+  border-color: #505048;
+  border-radius: 2px;
+}
+html[data-theme="pixel"] .task-modal .ant-modal-content {
+  background: #101010f5;
+  border: 1px solid #77776d;
+  border-radius: 2px;
+  box-shadow: 5px 5px 0 #000;
+}
+html[data-theme="pixel"] .task-modal .task-list > .task-project-card {
+  background: #1a1a18;
+  border-color: #4d4d45;
+  border-radius: 0;
+  box-shadow: 3px 3px 0 #000;
+}
+html[data-theme="pixel"] .task-modal .task-project-identity strong {
+  color: #e5e5df;
+}
+html[data-theme="pixel"] .task-modal .task-project-icon {
+  color: #d0d0c4;
+  background: #30302b;
+  border-radius: 0;
+}
+html[data-theme="pixel"]
+  .task-modal
+  :is(
+    .task-project-labels,
+    .task-project-meta,
+    .task-project-progress-label,
+    .task-project-details summary,
+    .task-step-name > span,
+    .task-project-delete.ant-btn
+  ) {
+  color: #aeaea2;
+}
+html[data-theme="pixel"] .task-modal .task-project-details li {
+  background: #272722;
+  color: #d0d0c4;
+  border-radius: 0;
+}
+html[data-theme="pixel"] .task-modal .task-project-details li.task-step-failed,
+html[data-theme="pixel"] .task-project-failures {
+  background: #302320;
+  color: #d2aba0;
+}
+html[data-theme="pixel"]
+  .task-modal
+  .task-project-delete.ant-btn:not(:disabled):hover {
+  background: #36362f;
+  color: #ededdf;
+}
+html[data-theme="pixel"] .task-modal .ant-progress-inner {
+  background: #3a3a32;
+  border-radius: 0;
+}
+html[data-theme="pixel"] .task-modal .ant-progress-bg,
+html[data-theme="pixel"] .task-modal .ant-progress-success-bg {
+  border-radius: 0;
+}
+html[data-theme="pixel"] :is(.collection-note-dialog-copy, .extraction-card) {
+  background: #1b1b18;
+  border-color: #48483f;
+  color: #d0d0c4;
+}
+html[data-theme="pixel"] .mobile-handoff-steps > div {
+  background: #252522;
+  color: #a6a69b;
+  border-radius: 0;
+}
+html[data-theme="pixel"] .mobile-handoff-steps > div.current {
+  background: #deded3;
+  color: #101010;
+}
+html[data-theme="pixel"]
+  :is(
+    .mobile-publish-qr,
+    .publication-content-preview,
+    .publication-preview-stage
+  ) {
+  background: #151515;
+  border-color: #55554c;
+}
+html[data-theme="pixel"] .ant-qrcode {
+  background: #fff !important;
+}
+html[data-theme="pixel"] .media-upload-modal .ant-upload-drag {
+  background: #1d1d18;
+  border-color: #55554c;
+}
+html[data-theme="pixel"] .admin-sidebar,
+html[data-theme="pixel"] .rednote-login.user-login .login-story {
+  background: #0b0b0b;
+  border-color: #55554c;
+}
+html[data-theme="pixel"] .admin-nav-item.selected {
+  background: #d0d0c4;
+  color: #090909;
+}
+html[data-theme="pixel"]
+  .admin-shell
+  :is(
+    .admin-panel,
+    .admin-page-card,
+    .admin-metric,
+    .admin-model-group,
+    .admin-header
+  ) {
+  background: #141414;
+  border-color: #44443c;
+  color: #e5e5df;
+}
+html[data-theme="pixel"] .rednote-login :is(.login-panel, .login-form-card) {
+  background: #141414;
+  color: #e5e5df;
+}
+@media (max-width: 700px) {
+  html[data-theme="pixel"]
+    .rednote-shell
+    .responsive-record-table
+    .ant-table-tbody
+    > tr.ant-table-row {
+    background: #181815;
+    border-color: #4a4a42;
+    border-radius: 0;
+  }
+  html[data-theme="pixel"]
+    .rednote-shell
+    .responsive-record-table
+    td[data-field-label]::before {
+    color: #aeaea2;
+  }
+}
+
+/* Empty states, generated-result viewers and publication editors share the palette. */
+html[data-theme="pixel"] .ant-input,
+html[data-theme="pixel"] .ant-input-affix-wrapper,
+html[data-theme="pixel"] .ant-select-selector,
+html[data-theme="pixel"] .ant-input-number {
+  border-radius: 0;
+}
+html[data-theme="pixel"] .rednote-shell .capture-card textarea::placeholder,
+html[data-theme="pixel"]
+  .rednote-shell
+  .collection-primary-tools
+  input::placeholder {
+  color: #92928a;
+  opacity: 1;
+}
+html[data-theme="pixel"] .rednote-shell .ant-empty-description,
+html[data-theme="pixel"] .rednote-shell .publication-stat > span {
+  color: #aeaea2;
+}
+html[data-theme="pixel"] .rednote-shell .usage-page-head h2 {
+  color: #f0f0e8;
+  font: 24px/1.5 var(--pixel-font);
+}
+html[data-theme="pixel"]
+  .creation-workflow
+  .workflow-navigation
+  .workflow-icon-toolbar
+  .workflow-step-button[aria-current="step"]:hover {
+  background: #deded3;
+  color: #090909;
+}
+html[data-theme="pixel"]
+  .rednote-shell
+  :is(
+    .original-material-empty,
+    .creation-material-choice,
+    .source-media-empty,
+    .local-media-card,
+    .media-preview-large
+  ) {
+  background: #1b1b18;
+  color: #bdbdb1;
+  border-color: #48483f;
+  border-radius: 0;
+}
+html[data-theme="pixel"] .creation-material-choice.selected {
+  background: #30302b;
+  border-color: #d0d0c4;
+}
+html[data-theme="pixel"] .creation-material-choice > :is(img, video) {
+  background: #111;
+  border-radius: 0;
+}
+html[data-theme="pixel"]
+  .rednote-shell
+  :is(
+    .local-media-card .media-preview-button,
+    .media-preview-button img,
+    .media-preview-button video
+  ) {
+  border-radius: 0;
+}
+html[data-theme="pixel"]
+  .creation-workflow
+  :is(.title-wheel-panel, .copy-letter-workspace, .copy-letter-paper) {
+  background: #181815;
+  border-color: #48483f;
+}
+html[data-theme="pixel"] .title-wheel-ring {
+  background: conic-gradient(#1f1f1b, #4d4d44, #282823, #5a5a50, #1f1f1b);
+  border-color: #626258;
+}
+html[data-theme="pixel"] .title-wheel-hub {
+  background: #23231f;
+  border-color: #5d5d53;
+  color: #deded3;
+}
+html[data-theme="pixel"] .title-wheel-card {
+  background: #1e1e1a;
+  border-color: #505047;
+  border-radius: 0;
+  box-shadow: 3px 3px 0 #000;
+}
+html[data-theme="pixel"] .title-wheel-card.is-selected {
+  background: #30302a;
+  border-color: #deded3;
+}
+html[data-theme="pixel"]
+  :is(
+    .title-wheel-card .ant-input,
+    .copy-letter-preview,
+    .copy-letter-paper header
+  ) {
+  color: #deded3;
+}
+html[data-theme="pixel"]
+  :is(
+    .title-wheel-card-meta,
+    .title-wheel-card-meta > small,
+    .title-wheel-hub > small,
+    .copy-letter-topics,
+    .copy-letter-content > small
+  ) {
+  color: #aeaea2;
+}
+html[data-theme="pixel"] .copy-letter-sidebar {
+  background: #20201c;
+  border-color: #48483f;
+}
+html[data-theme="pixel"] .copy-letter-sidebar .ant-btn {
+  background: #2b2b25;
+  color: #bdbdb1;
+}
+html[data-theme="pixel"] .copy-letter-sidebar .ant-btn[aria-pressed="true"] {
+  background: #deded3;
+  color: #090909;
+}
+html[data-theme="pixel"] :is(.copy-envelope-back, .copy-envelope-back::before) {
+  background: #383830;
+}
+html[data-theme="pixel"] .copy-envelope-front {
+  background: linear-gradient(155deg, #55554a, #33332b);
+}
+html[data-theme="pixel"]
+  .publication-confirmation
+  :is(
+    .publication-content-preview,
+    .publication-editor-media,
+    .publication-editor-thumbnails button
+  ) {
+  background: #1a1a17;
+  border-color: #55554c;
+  border-radius: 0;
+}
+html[data-theme="pixel"]
+  .publication-editor-thumbnails
+  button[aria-current="true"] {
+  border-color: #deded3;
+  box-shadow: 0 0 0 2px #55554c;
+}
+html[data-theme="pixel"] .publication-editor-arrow.ant-btn {
+  color: #deded3;
+  background: #1b1b18ed;
+}
+html[data-theme="pixel"] .mobile-publish-help {
+  color: #aeaea2;
+}
+html[data-theme="pixel"] .task-modal .ant-tag-green {
+  color: #bec9b8;
+  background: #263023;
+  border-color: #46533e;
+}

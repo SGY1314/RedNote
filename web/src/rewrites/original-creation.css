@@ -1,0 +1,110 @@
+.original-creation-input {
+  min-width: 0;
+}
+.original-material-source {
+  display: grid;
+  align-content: start;
+  gap: 12px;
+  min-width: 0;
+}
+.original-material-empty {
+  display: grid;
+  align-content: center;
+  width: 100%;
+  aspect-ratio: 3/4;
+  min-height: 180px;
+  border: 1px dashed var(--forest-line);
+  border-radius: 12px;
+  background: #f7faf8;
+}
+.original-material-empty .ant-empty {
+  margin: 0;
+  font-size: 12px;
+}
+.original-material-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+.original-material-actions > .ant-btn {
+  width: 100%;
+  height: 36px;
+  padding: 4px;
+  font-size: 12px;
+}
+.original-material-actions .ant-btn-icon {
+  display: none;
+}
+.original-content-fields {
+  display: grid;
+  align-content: start;
+  gap: 14px;
+  min-width: 0;
+}
+.creation-material-modal .ant-modal-body {
+  min-width: 0;
+}
+.creation-material-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  max-height: 440px;
+  overflow-y: auto;
+  margin-top: 16px;
+  padding: 2px;
+}
+.creation-material-choice {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  padding: 8px;
+  border: 1px solid var(--forest-line);
+  border-radius: 12px;
+  background: #fff;
+  cursor: pointer;
+}
+.creation-material-choice.selected {
+  border-color: var(--forest-accent);
+  background: #f0f7f3;
+}
+.creation-material-choice > img,
+.creation-material-choice > video {
+  width: 100%;
+  aspect-ratio: 4/3;
+  object-fit: contain;
+  background: #f5f7fa;
+  border-radius: 8px;
+}
+.creation-material-choice .ant-checkbox-wrapper {
+  min-width: 0;
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+@media (max-width: 600px) {
+  .original-creation-input .title-original-note {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .original-material-source {
+    grid-template-columns: minmax(90px, 0.6fr) minmax(0, 1fr);
+    align-items: center;
+  }
+  .original-material-actions {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .original-material-empty {
+    min-height: 120px;
+  }
+  .creation-material-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    max-height: 50dvh;
+  }
+}
+
+@media (max-width: 600px) {
+  .material-only-input .original-material-source {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .material-only-input .original-material-actions {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

@@ -1,0 +1,264 @@
+.creation-workflow:has(> .media-rewrite-image) {
+  --workflow-panel-width: 100%;
+}
+html[data-theme]
+  .rednote-shell
+  .page-rewrites
+  .creation-workflow
+  > .workflow-panel.media-rewrite-image {
+  container: image-editor / inline-size;
+  display: grid;
+  gap: 22px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
+  color: var(--forest-ink);
+}
+.image-composer {
+  min-width: 0;
+}
+.image-composer-columns {
+  display: grid;
+  grid-template-columns: minmax(210px, 0.78fr) minmax(0, 1.8fr);
+  align-items: stretch;
+  gap: 16px;
+}
+.image-composer .image-composer-card {
+  min-width: 0;
+  padding: 18px;
+  border: 1px solid var(--forest-line);
+  border-radius: 16px;
+  background: var(--forest-paper);
+  box-shadow: var(--surface-shadow);
+}
+.image-composer .image-composer-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 30px;
+}
+.image-composer .image-composer-heading h3 {
+  margin: 0;
+  color: var(--forest-ink);
+  font-size: 17px;
+  line-height: 1.5;
+  font-weight: 650;
+  white-space: nowrap;
+}
+.image-composer-heading h3 > .anticon {
+  margin-right: 4px;
+  color: var(--forest-accent);
+}
+.image-reference-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.image-reference-panel .image-composer-heading {
+  flex-wrap: wrap;
+}
+.image-reference-panel .ant-btn {
+  font-size: 12px;
+}
+.image-reference-gallery {
+  display: grid;
+  gap: 12px;
+  padding: 10px;
+  border: 1px solid var(--forest-line);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--forest-sage) 65%, transparent);
+}
+.image-reference-gallery .media-source-carousel.title-original-media {
+  width: 100%;
+  max-height: none;
+  aspect-ratio: 3 / 4;
+  border-color: var(--forest-line);
+  background: var(--forest-paper);
+  border-radius: 10px;
+}
+.image-reference-gallery
+  :is(.media-source-stage .ant-image-img, .source-book-front img) {
+  object-fit: contain;
+  object-position: center;
+}
+.image-reference-gallery .media-source-carousel .source-page-button.ant-btn,
+.image-reference-gallery :is(.source-media-index, .source-media-choice) {
+  background: var(--forest-paper);
+  color: var(--forest-ink);
+}
+.image-reference-gallery
+  .media-source-carousel
+  .source-page-button.ant-btn:disabled {
+  color: var(--forest-muted);
+  opacity: 0.6;
+}
+.image-reference-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  aspect-ratio: 3 / 4;
+  width: 100%;
+  border: 1px dashed var(--forest-line);
+  border-radius: 10px;
+  background: transparent;
+  color: var(--forest-accent);
+  font: inherit;
+  cursor: pointer;
+}
+.image-reference-empty .anticon {
+  font-size: 30px;
+}
+.image-reference-empty:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+.image-reference-thumbnails {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 2px 1px 4px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--forest-accent) transparent;
+}
+.image-reference-thumbnails > button {
+  position: relative;
+  flex: 0 0 48px;
+  width: 48px;
+  height: 54px;
+  padding: 2px;
+  border: 1px solid var(--forest-line);
+  border-radius: 7px;
+  background: var(--forest-paper);
+  cursor: pointer;
+}
+.image-reference-thumbnails > button.is-active {
+  border: 2px solid var(--forest-accent);
+  padding: 1px;
+}
+.image-reference-thumbnails img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 4px;
+}
+.image-thumbnail-selected {
+  position: absolute;
+  right: 2px;
+  bottom: 2px;
+  display: grid;
+  place-items: center;
+  width: 15px;
+  height: 15px;
+  border-radius: 3px;
+  background: var(--forest-accent);
+  color: var(--button-primary-text);
+  font-size: 11px;
+}
+.image-configuration-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.image-composer .image-copy-context {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid var(--forest-line);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--forest-sage) 48%, transparent);
+  overflow-wrap: anywhere;
+}
+.image-copy-context > h3 {
+  margin: 0;
+  font-size: 19px;
+  line-height: 1.5;
+  color: var(--forest-ink);
+}
+.image-copy-context > p {
+  margin: 0;
+  max-height: 180px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  font-size: 14px;
+  line-height: 1.8;
+  color: var(--forest-ink);
+}
+.image-copy-context .title-original-topics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.image-copy-context .title-original-topics > span {
+  margin: 0;
+  padding: 3px 9px;
+  border-radius: 8px;
+  background: var(--forest-sage);
+  color: var(--forest-accent);
+  font-size: 12px;
+}
+.image-composer .workflow-field {
+  min-width: 0;
+  color: var(--forest-muted);
+}
+.image-composer .workflow-field .ant-select {
+  min-width: 0;
+  width: 100%;
+}
+.media-rewrite-image > .workflow-result-section,
+.media-rewrite-image > .workflow-next {
+  padding: 18px;
+  border: 1px solid var(--forest-line);
+  border-radius: 14px;
+  background: var(--forest-paper);
+}
+html[data-theme="rose"] .image-composer .image-composer-card,
+html[data-theme="rose"]
+  .media-rewrite-image
+  > :is(.workflow-result-section, .workflow-next) {
+  background: linear-gradient(135deg, #fffaf8bf, #fff7faa1);
+  border-color: #fffaf8c7;
+  backdrop-filter: blur(14px);
+}
+html[data-theme="pixel"]
+  .image-composer
+  :is(
+    .image-composer-card,
+    .image-reference-gallery,
+    .image-copy-context,
+    .image-reference-thumbnails button,
+    .image-reference-thumbnails img
+  ),
+html[data-theme="pixel"]
+  .media-rewrite-image
+  > :is(.workflow-result-section, .workflow-next) {
+  border-radius: 0;
+  box-shadow: none;
+}
+@container image-editor (max-width: 640px) {
+  .image-composer-columns {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .image-reference-panel .image-composer-heading {
+    flex-wrap: nowrap;
+  }
+  .image-reference-panel .image-reference-gallery {
+    max-width: 300px;
+    width: 100%;
+    align-self: center;
+  }
+}
+
+.image-system-prompt-field {
+  flex: 1;
+  align-content: start;
+}
+.image-system-prompt-field > span:first-child {
+  font-size: 15px;
+  font-weight: 600;
+}

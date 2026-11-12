@@ -1,0 +1,75 @@
+.media-filter-popover .ant-popover-inner {
+  padding: 20px;
+  border: 1px solid var(--forest-line);
+  border-radius: 14px;
+  background: var(--forest-paper);
+  box-shadow: 0 8px 32px rgb(22 32 24 / 12%);
+}
+.media-filter-popover .media-library-filters {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  width: 280px;
+  max-width: calc(100vw - 64px);
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+.media-filter-popover .media-library-filter {
+  gap: 8px;
+}
+.media-filter-popover .media-library-filter > span {
+  color: var(--forest-muted);
+  font-size: 12px;
+}
+.media-filter-popover .media-filter-reset {
+  align-self: flex-end;
+  margin-top: -2px;
+}
+.media-filter-count {
+  color: var(--forest-accent);
+  background: var(--forest-sage);
+}
+@media (min-width: 701px) {
+  .rednote-shell .page-content.page-media {
+    padding-top: 0;
+  }
+  .rednote-shell .page-media .standalone-media-page {
+    margin-top: 24px;
+  }
+  .rednote-shell .page-content.page-collections,
+  .rednote-shell .page-content.page-publications {
+    max-width: 1400px;
+    padding-inline: clamp(48px, 7vw, 104px);
+  }
+  .rednote-shell .publication-filter-grid {
+    grid-template-columns: minmax(120px, 1fr) 128px 152px;
+  }
+  .rednote-shell .publication-filter-grid > :first-child {
+    grid-column: auto;
+  }
+  .media-library-toolbar .media-library-toolbar-row {
+    flex-wrap: nowrap;
+  }
+  .media-library-toolbar-row > .ant-btn {
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+  .rednote-shell .page-media .media-library-toolbar {
+    position: sticky;
+    top: 0;
+    z-index: 12;
+    padding-block: 12px;
+    background: transparent;
+    border-bottom-color: var(--forest-line);
+  }
+  .rednote-shell .page-media .media-library-toolbar-row .ant-input-search {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+}
+html[data-theme="pixel"] .media-filter-popover .ant-popover-inner {
+  border-radius: 0;
+  box-shadow: 3px 3px 0 #62625c;
+}
