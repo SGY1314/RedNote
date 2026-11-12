@@ -8,7 +8,7 @@ Source: https://github.com/JoeanAmier/XHS-Downloader
 
 Version: 2.8. Commit: `47840a1bee8438324ff10753c4291148c46071c8`.
 
-Original license: `collector/LICENSE.upstream`. The pinned unmodified source is retained in `collector/vendor/`. Integration wrapper: `collector/server.py`. Desktop-only `pywebview` is not installed by this API-only integration; the remaining dependency versions are locked in `collector/requirements.lock`.
+Original license: `collector/LICENSE.upstream`. The source used by this integration is retained in `collector/vendor/`. Repository cleanup removes upstream screenshots, advertising, donation QR codes and duplicate readmes; Python source, runtime resources and licenses are retained. Provenance: `collector/UPSTREAM.md`. Integration wrapper: `collector/server.py`. Desktop-only `pywebview` is not installed by this API-only integration; the remaining dependency versions are locked in `collector/requirements.lock`.
 
 ## xiaohongshu-mcp publisher fork
 
@@ -18,7 +18,7 @@ Source: https://github.com/xpzouying/xiaohongshu-mcp/tree/v2.5.5
 
 Pinned tag: `v2.5.5`. Modified vendored source and original license: `publisher/upstream/`, `publisher/upstream/LICENSE`. Provenance, archive digest and modification notes: `publisher/README.md`; source differences: `publisher/workbench.patch`.
 
-This integration uses locally installed Chrome/Edge and disables the upstream custom browser download, fingerprint options and stealth script. Its routes are restricted to authenticated local login and publishing operations. Login sessions use Windows DPAPI. Upstream names and documentation are preserved for attribution, not to represent an endorsement. Locked transitive dependencies are recorded in `publisher/upstream/go.mod` and `go.sum`, including go-rod (MIT) and headless_browser (MIT).
+This integration uses locally installed Chrome/Edge and disables the upstream custom browser download, fingerprint options and stealth script. Its routes are restricted to authenticated local login and publishing operations. Login sessions use Windows DPAPI. Upstream attribution and original license are preserved; unrelated deployment examples, editor settings, skills and duplicate documentation are omitted. This does not represent an upstream endorsement. Locked transitive dependencies are recorded in `publisher/upstream/go.mod` and `go.sum`, including go-rod (MIT) and headless_browser (MIT).
 
 ## Other dependencies
 

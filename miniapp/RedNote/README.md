@@ -18,6 +18,8 @@
 
 ## 连接与预览
 
+首次从 GitHub 获取源码后，先把 `config/runtime.example.js` 复制为 `config/runtime.local.js`；`setup.cmd` 也会在该文件不存在时创建安全空配置。已有本地配置不会被覆盖，真实连接配置不提交到 Git。运行小程序测试前也需要完成这一步。
+
 维护源码位于本目录；开发者工具副本为 `C:\Users\asus\Desktop\RedNoteapp\RedNote`。在仓库根目录执行：
 
 ```powershell

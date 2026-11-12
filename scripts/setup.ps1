@@ -60,4 +60,5 @@ try {
 if (Test-Path -LiteralPath 'bin\publisher-next.exe') { Remove-Item -LiteralPath (Join-Path $ProjectRoot 'bin\publisher-next.exe') -Force }
 if (Test-Path -LiteralPath 'bin\workbench-next.exe') { Remove-Item -LiteralPath (Join-Path $ProjectRoot 'bin\workbench-next.exe') -Force }
 if (!(Test-Path 'config\local.json')) { Copy-Item -LiteralPath 'config\example.json' -Destination 'config\local.json' }
+if (!(Test-Path 'miniapp\RedNote\config\runtime.local.js')) { Copy-Item -LiteralPath 'miniapp\RedNote\config\runtime.example.js' -Destination 'miniapp\RedNote\config\runtime.local.js' }
 Write-Host 'Ready. Run scripts/start.ps1' -ForegroundColor Green

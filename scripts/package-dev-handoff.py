@@ -21,7 +21,7 @@ private_suffixes = {".log", ".tsbuildinfo", ".key", ".pem", ".sqlite", ".sqlite3
 files = {}
 for top in sorted(roots):
     for directory, dirs, names in os.walk(root / top):
-        dirs[:] = sorted(d for d in dirs if d not in skip and not (Path(directory) / d).is_symlink())
+        dirs[:] = sorted(d for d in dirs if d not in skip and not d.startswith("src-backup-") and not (Path(directory) / d).is_symlink())
         for name in sorted(names):
             p = Path(directory) / name
             if p.is_symlink() or p.suffix.lower() in private_suffixes or name.startswith(".env") or name.endswith(".local.json") or name == "project.private.config.json":
@@ -35,13 +35,7 @@ for p in root.iterdir():
         files[p.name] = p.read_bytes()
 for name in ("config/example.json", "config/model-presets.json"):
     files[name] = (root / name).read_bytes()
-# Only copy text reports, never screenshots, captured downloads or user databases.
-for folder in ("rewrite-audit", "collection-audit", "publication-audit", "publication-replacement"):
-    source = root / "data/verification" / folder
-    if source.exists():
-        for p in source.glob("*.md"):
-            content = p.read_text(encoding="utf-8-sig").replace(str(root), "<PROJECT_ROOT>")
-            files[f"docs/handoff-reports/{folder}/{p.name}"] = content.encode("utf-8")
+# Current reports are maintained in docs; never import historical live-data reports.
 files.setdefault("miniapp/RedNote/config/runtime.local.js", b"module.exports = {};\n")
 # Check against credential values from local config without logging those values.
 secrets = set()
@@ -72,7 +66,7 @@ with zipfile.ZipFile(output) as archive:
     assert archive.testzip() is None
     for entry in manifest["files"]:
         assert hashlib.sha256(archive.read("RedNote-Source/" + entry["path"])).hexdigest() == entry["sha256"]
-    for rel in ("internal/app/publication_replacement_test.go", "web/src/publicationVisibility.ts", "web/package-lock.json", "go.sum", "config/example.json", "交接必读-20261108.md"):
+    for rel in ("internal/app/publication_replacement_test.go", "web/src/publicationVisibility.ts", "web/package-lock.json", "go.sum", "config/example.json", "docs/MAINTENANCE.md"):
         assert "RedNote-Source/" + rel in archive.namelist()
     for name in archive.namelist():
         rel = Path(name).parts[1:]

@@ -10,6 +10,8 @@ import os
 from pathlib import Path
 import re
 import shutil
+import subprocess
+import sys
 from urllib.parse import urlsplit
 import zipfile
 
@@ -30,22 +32,9 @@ def copy_tree(source, target, extra=()):
 
 
 def source_archive(path):
-    # Explicit top-level allowlist: never traverse live data, logs or local config.
-    roots = ["cmd", "internal", "collector", "douyin", "publisher", "scripts", "docs", "web"]
-    files = ["go.mod", "go.sum", "README.md", "THIRD_PARTY_NOTICES.md", "start.cmd", "stop.cmd", "restart.cmd", "setup.cmd", "config/example.json", "config/model-presets.json"]
-    with zipfile.ZipFile(path, "w", zipfile.ZIP_DEFLATED, compresslevel=6) as archive:
-        for name in roots:
-            for directory, dirs, names in os.walk(PROJECT / name):
-                dirs[:] = sorted(d for d in dirs if d not in SKIP_DIRS | {"node_modules", "dist", ".github", ".claude", ".cursor", "donate"})
-                if Path(directory) == PROJECT / "publisher/upstream":
-                    dirs[:] = [d for d in dirs if d not in {"assets", "examples"}]
-                for filename in sorted(set(names) - set(ignored(directory, names))):
-                    file = Path(directory) / filename
-                    if file.suffix.lower() in {".zip", ".exe"}:
-                        continue
-                    archive.write(file, "xhs-workbench/" + file.relative_to(PROJECT).as_posix())
-        for name in files:
-            archive.write(PROJECT / name, "xhs-workbench/" + name)
+    # Use the same reviewed source scope for developer handoff and runtime releases.
+    subprocess.run([sys.executable, str(PROJECT / "scripts/package-dev-handoff.py"),
+                    "--output", str(path)], check=True)
 
 
 def write(path, text, encoding="utf-8-sig"):
